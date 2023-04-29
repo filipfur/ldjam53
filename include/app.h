@@ -13,6 +13,8 @@ enum class GameStateType
     MAIN
 };
 
+using TextureArray = std::vector<std::shared_ptr<lithium::Texture<unsigned char>>>;
+
 class App : public lithium::Application
 {
 public:
