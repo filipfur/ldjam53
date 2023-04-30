@@ -19,6 +19,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME} lithium)
 
 add_subdirectory(lithium)
 
+add_subdirectory(test/rotationgraph)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 install(TARGETS ${CMAKE_PROJECT_NAME} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin)
