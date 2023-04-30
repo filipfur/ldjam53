@@ -58,6 +58,8 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
 
     _currentGameState = GameStateType::MAIN;
 
+    _playerControl = std::make_unique<PlayerControl>(screen, input());
+
     printf("%s\n", glGetString(GL_VERSION));
 }
 
@@ -83,6 +85,8 @@ void App::update(float dt)
     // set camY so that it is truly isometric
     float camY = goptions::cameraRadius * 0.5f;
     camera->setPosition(glm::vec3{camX, camY, camZ});
+
+    _playerControl->update(dt);
 
     camera->update(dt);
     _pipeline->setTime(time());

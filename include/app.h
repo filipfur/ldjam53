@@ -7,6 +7,7 @@
 #include "pipeline.h"
 #include "assetfactory.h"
 #include "glgamestate.h"
+#include "playercontrol.h"
 
 enum class GameStateType
 {
@@ -45,4 +46,5 @@ private:
     std::set<GameStateType> _stateTransitions;
     std::vector<lithium::GameState> _gameStates;
     GameStateType _currentGameState;
+    std::unique_ptr<PlayerControl> _playerControl;
 };
