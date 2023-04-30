@@ -19,6 +19,7 @@ public:
     struct Textures
     {
         std::shared_ptr<lithium::ImageTexture> logoDiffuse;
+        std::shared_ptr<lithium::ImageTexture> delivermanSheet;
     } _textures;
 
     struct Objects

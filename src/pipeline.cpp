@@ -1,6 +1,7 @@
-#include "assetfactory.h"
 #include "pipeline.h"
+#include "assetfactory.h"
 #include "glinstancedobject.h"
+#include "sprite.h"
 
 Pipeline::Pipeline(const glm::ivec2& resolution) : lithium::RenderPipeline{resolution},
     _camera{new lithium::SimpleCamera(glm::perspective(glm::radians(45.0f), (float)resolution.x / (float)resolution.y, 0.1f, 100.0f))},
@@ -10,10 +11,15 @@ Pipeline::Pipeline(const glm::ivec2& resolution) : lithium::RenderPipeline{resol
     enableBlending();
     blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     enableMultisampling();
+    enableFaceCulling();
 
     _blockShader = std::make_shared<lithium::ShaderProgram>("shaders/object.vert", "shaders/object.frag");
     _blockShader->setUniform("u_texture_0", 0);
     _blockShader->setUniform("u_projection", _camera->projection());
+
+    _spriteShader = std::make_shared<lithium::ShaderProgram>("shaders/object.vert", "shaders/sprite.frag");
+    _spriteShader->setUniform("u_texture_0", 0);
+    _spriteShader->setUniform("u_projection", _camera->projection());
 
     _instanceShader = std::make_shared<lithium::ShaderProgram>("shaders/instance.vert", "shaders/object.frag");
     _instanceShader->setUniform("u_texture_0", 0);
@@ -35,6 +41,10 @@ Pipeline::Pipeline(const glm::ivec2& resolution) : lithium::RenderPipeline{resol
         return dynamic_cast<lithium::InstancedObject<glm::mat4>*>(renderable);
     });
 
+    _spriteGroup = createRenderGroup([this](lithium::Renderable* renderable) -> bool {
+        return dynamic_cast<Sprite*>(renderable);
+    });
+
     _mainGroup = createRenderGroup([this](lithium::Renderable* renderable) -> bool {
         return !renderable->hasAttachments();
     });
@@ -50,12 +60,14 @@ Pipeline::Pipeline(const glm::ivec2& resolution) : lithium::RenderPipeline{resol
         enableDepthWriting();
 
         _blockShader->setUniform("u_view", _camera->view());
-        _blockShader->setUniform("u_time", 0.0f);
         _mainGroup->render(_blockShader.get());
 
         _instanceShader->setUniform("u_view", _camera->view());
-        _instanceShader->setUniform("u_time", 0.0f);
         _instanceGroup->render(_instanceShader.get());
+
+        _spriteShader->setUniform("u_view", _camera->view());
+        _spriteShader->setUniform("u_time", _time);
+        _spriteGroup->render(_spriteShader.get());
     }));
 
     _finalStage = addRenderStage(std::make_shared<lithium::RenderStage>(nullptr, glm::ivec4{0, 0, resolution.x, resolution.y}, [this](){

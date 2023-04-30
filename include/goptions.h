@@ -26,6 +26,7 @@ namespace goptions
 // Compile-time intialized in goptions.cpp
 
 extern const float cubeSideLengths;
+extern const float cameraRadius;
 
 
 ////////////////////////////////////////////////////////////////////////////////

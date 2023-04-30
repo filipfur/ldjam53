@@ -1,6 +1,6 @@
 #include "app.h"
-
-
+#include "goptions.h"
+#include "sprite.h"
 
 App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Application::Mode::MULTISAMPLED_4X, false}
 {
@@ -8,20 +8,28 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
     AssetFactory::loadTextures();
     AssetFactory::loadObjects();
     AssetFactory::loadFonts();
+    _pipeline = std::make_shared<Pipeline>(defaultFrameBufferResolution());
     auto object = std::make_shared<lithium::InstancedObject<glm::mat4>>(AssetFactory::getMeshes()->cube,
         TextureArray{AssetFactory::getTextures()->logoDiffuse});
     object->setPosition(glm::vec3{0.0f});
     object->setScale(1.0f);
-    _pipeline = std::make_shared<Pipeline>(defaultFrameBufferResolution());
-    _pipeline->attach(object.get());
-    object->stage();
+    //object->stage();
 
-    for(int i{0}; i < 200; ++i)
+    auto screen = std::make_shared<Sprite>(AssetFactory::getMeshes()->screen,
+        TextureArray{AssetFactory::getTextures()->delivermanSheet});
+    screen->setPosition(glm::vec3{0.0f});
+    screen->setScale(1.0f);
+    screen->setSpriteDimension(glm::ivec2{32, 32});
+    screen->setRegionPosition(glm::vec2{0.0f, 0.0f});
+    screen->setFramesPerSecond(5.0f);
+
+    //_pipeline->attach(object.get());
+
+    for(int i{0}; i < 32; ++i)
     {
         glm::mat4 model{1.0f};
-        // Translate random position between -20 and 20 on x, y and z axis
-        model = glm::translate(model, glm::vec3{static_cast<float>(rand() % 40 - 20),
-            static_cast<float>(rand() % 40 - 20), static_cast<float>(rand() % 40 - 20)});
+        // Translate random position between -8 and 8 on x, y and z axis with 2 unit between them, using rand()
+        model = glm::translate(model, glm::vec3{((rand() % 8) - 4) * 2.0f, ((rand() % 8) - 4) * 2.0f, ((rand() % 8) - 4) * 2.0f});
         object->addInstance(model);
     }
     object->allocateBufferData();
@@ -40,6 +48,8 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
 
     auto firstScene = std::make_shared<lithium::Scene>();
     firstScene->addObject(object);
+    firstScene->addObject(screen);
+    firstScene->attach(_pipeline);
     
     lithium::GameState firstGameState;
     firstGameState.addScene(firstScene);
@@ -65,17 +75,17 @@ void App::update(float dt)
     handleStateTransitions();
 
     std::shared_ptr<lithium::SimpleCamera> camera = _pipeline->camera();
-
-    float cameraRadius = 30.0f;
-
     float t = time() * 0.1f;
-
-    float camX = sin(t) * cameraRadius;
-    float camZ = cos(t) * cameraRadius;
-
-    camera->setPosition(glm::vec3{camX, 30.0f, camZ});
+    // set t to lock at isometric view, without using magic numbers
+    t = glm::radians(45.0f);
+    float camX = sin(t) * goptions::cameraRadius;
+    float camZ = cos(t) * goptions::cameraRadius;
+    // set camY so that it is truly isometric
+    float camY = goptions::cameraRadius * 0.5f;
+    camera->setPosition(glm::vec3{camX, camY, camZ});
 
     camera->update(dt);
+    _pipeline->setTime(time());
     _pipeline->render();
 }
 

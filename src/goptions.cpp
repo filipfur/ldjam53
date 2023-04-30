@@ -22,7 +22,8 @@
 namespace goptions
 {
 
-const float cubeSideLengths = 2.0;
+const float cubeSideLengths = 2.0f;
+const float cameraRadius = 16.0f;
 
 
 ////////////////////////////////////////////////////////////////////////////////
