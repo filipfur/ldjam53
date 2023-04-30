@@ -27,8 +27,13 @@ namespace goptions
 
 extern const float cubeSideLengths;
 extern const float cameraRadius;
+
 extern const float playerWalkSpeedMax;
 extern const float playerWalkAcceleration;
+extern const float playerJumpAcceleration;
+extern const float playerJumpTime;
+
+extern const float gravity;
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -12,6 +12,7 @@ uniform vec3 u_view_pos;
 
 uniform vec2 u_region_dimension;
 uniform vec2 u_region_position;
+uniform int u_flipped;
 
 out vec4 fragColor;
 
@@ -22,6 +23,11 @@ in vec3 fragPos;
 void main()
 {
     vec2 uv = texCoord;
+
+    if(u_flipped != 0)
+    {
+        uv.x = 1.0 - uv.x;
+    }
 
     /*calculate uv based on region dimension and region position*/
     uv = uv * u_region_dimension + u_region_position;

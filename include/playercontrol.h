@@ -25,10 +25,16 @@ public:
 
     virtual void update(float dt) override;
 
+    bool onGround()
+    {
+        return _state != JUMPING && _state != FALLING;
+    }
+
 private:
     std::shared_ptr<Sprite> _sprite;
     std::shared_ptr<lithium::Input::KeyCache> _keyCache;
     glm::vec3 _delta{0.0f};
+    float _jumpDuration{0.0f};
     State _state{IDLE};
     Direction _direction{RIGHT};
 };

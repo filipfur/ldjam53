@@ -15,21 +15,28 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
     object->setScale(1.0f);
     //object->stage();
 
-    auto screen = std::make_shared<Sprite>(AssetFactory::getMeshes()->screen,
-        TextureArray{AssetFactory::getTextures()->delivermanSheet});
-    screen->setPosition(glm::vec3{0.0f});
-    screen->setScale(1.0f);
-    screen->setSpriteDimension(glm::ivec2{32, 32});
-    screen->setRegionPosition(glm::vec2{0.0f, 0.0f});
-    screen->setFramesPerSecond(5.0f);
+    auto playerSprite = std::make_shared<Sprite>(AssetFactory::getMeshes()->screen,
+        TextureArray{AssetFactory::getTextures()->delivermanSheet}, glm::ivec2{32, 32});
+    playerSprite->setPosition(glm::vec3{0.0f, 0.0f, 1.01f});
+    playerSprite->setScale(1.0f);
+    playerSprite->setFramesPerSecond(5.0f);
+    playerSprite->createAnimation("idle", {0, 0, 0, 1, 1});
+    playerSprite->createAnimation("walk", {2, 3, 4, 5});
+    playerSprite->setAnimation("idle");
 
     //_pipeline->attach(object.get());
 
-    for(int i{0}; i < 32; ++i)
+    for(int i{0}; i < 6; ++i)
     {
         glm::mat4 model{1.0f};
-        // Translate random position between -8 and 8 on x, y and z axis with 2 unit between them, using rand()
-        model = glm::translate(model, glm::vec3{((rand() % 8) - 4) * 2.0f, ((rand() % 8) - 4) * 2.0f, ((rand() % 8) - 4) * 2.0f});
+        if(i < 4)
+        {
+            model = glm::translate(model, glm::vec3{-4.0f, 0.0f, 0.0f} + glm::vec3{2.0f, 0.0f, 0.0f} * (float)i);
+        }
+        else
+        {
+            model = glm::translate(model, glm::vec3{0.0f, 2.0f, 0.0f} + glm::vec3{2.0f, 0.0f, 0.0f} * (float)(i - 4));
+        }
         object->addInstance(model);
     }
     object->allocateBufferData();
@@ -48,7 +55,7 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
 
     auto firstScene = std::make_shared<lithium::Scene>();
     firstScene->addObject(object);
-    firstScene->addObject(screen);
+    firstScene->addObject(playerSprite);
     firstScene->attach(_pipeline);
     
     lithium::GameState firstGameState;
@@ -58,7 +65,7 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
 
     _currentGameState = GameStateType::MAIN;
 
-    _playerControl = std::make_unique<PlayerControl>(screen, input());
+    _playerControl = std::make_unique<PlayerControl>(playerSprite, input());
 
     printf("%s\n", glGetString(GL_VERSION));
 }

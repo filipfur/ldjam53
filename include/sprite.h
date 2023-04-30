@@ -1,18 +1,36 @@
 #pragma once
 
 #include "globject.h"
+#include "glanimation.h"
 
 class Sprite : public lithium::Object
 {
+    struct Animation
+    {
+        std::vector<glm::vec2> uvs;
+    };
+
 public:
-    Sprite(std::shared_ptr<lithium::Mesh> mesh, const std::vector<lithium::Object::TexturePointer>& texture);
+    Sprite(std::shared_ptr<lithium::Mesh> mesh, const std::vector<lithium::Object::TexturePointer>& texture, const glm::ivec2& spriteDimension);
     Sprite(const Sprite& other);
-    Sprite(const Object& other);
     virtual ~Sprite() noexcept;
 
     virtual void update(float dt) override;
 
     virtual void shade(lithium::ShaderProgram* shaderProgram) override;
+
+    void createAnimation(const std::string& name, const std::initializer_list<int>& frameIds)
+    {
+        Animation animation;
+        for(int frameId : frameIds)
+        {
+            glm::ivec2 frameXY{frameId % _framesXY.x, frameId / _framesXY.x};
+            glm::vec2 uvPosition{frameXY.x * _regionDimension.x, frameXY.y * _regionDimension.y};
+            animation.uvs.push_back(uvPosition);
+        }
+        _animations[name] = animation;
+        _currentAnimation = _animations.begin();
+    }
 
     virtual Sprite* clone() const override
     {
@@ -29,11 +47,6 @@ public:
         std::cout << "regionDimension: " << _regionDimension.x << ", " << _regionDimension.y << std::endl;
         std::cout << "framesXY: " << _framesXY.x << ", " << _framesXY.y << std::endl;
 
-    }
-
-    void setRegionPosition(const glm::vec2& regionPosition)
-    {
-        _regionPosition = regionPosition;
     }
 
     const glm::vec2& regionDimension() const
@@ -53,7 +66,29 @@ public:
         _frameDuration = _frameInterval;
     }
 
+    void setFlipped(bool flipped)
+    {
+        _flipped = flipped;
+    }
+
+    void setAnimation(const std::string& animationName)
+    {
+        if(_currentAnimation->first == animationName)
+        {
+            return;
+        }
+        _currentAnimation = _animations.find(animationName);
+        _currentFrame = 0;
+    }
+
+    std::string animationName() const
+    {
+        return _currentAnimation->first;
+    }
+
 private:
+    std::map<std::string, Animation> _animations;
+    std::map<std::string, Animation>::iterator _currentAnimation;
     glm::ivec2 _spriteDimension;
     glm::vec2 _regionDimension{1.0f, 1.0f};
     glm::vec2 _regionPosition{0.0f, 0.0f};
@@ -62,4 +97,5 @@ private:
     float _framesPerSecond;
     float _frameInterval{0.0f};
     float _frameDuration{0.0f};
+    bool _flipped{false};
 };
