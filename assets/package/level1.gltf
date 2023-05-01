@@ -19,7 +19,13 @@
 				8,
 				9,
 				10,
-				11
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17
 			]
 		}
 	],
@@ -172,6 +178,72 @@
 				9,
 				5,
 				0
+			]
+		},
+		{
+			"mesh":2,
+			"name":"LongPackage.002",
+			"rotation":[
+				0,
+				-1,
+				0,
+				1.6292068494294654e-07
+			],
+			"translation":[
+				13,
+				3,
+				-2
+			]
+		},
+		{
+			"mesh":0,
+			"name":"Package.010",
+			"translation":[
+				13,
+				1,
+				0
+			]
+		},
+		{
+			"mesh":0,
+			"name":"Package.011",
+			"rotation":[
+				0,
+				-0.7071064710617065,
+				0,
+				0.7071071863174438
+			],
+			"translation":[
+				15,
+				1,
+				0
+			]
+		},
+		{
+			"mesh":0,
+			"name":"Package.012",
+			"translation":[
+				13,
+				1,
+				-4
+			]
+		},
+		{
+			"mesh":1,
+			"name":"Invisible.003",
+			"translation":[
+				13,
+				3,
+				0
+			]
+		},
+		{
+			"mesh":1,
+			"name":"Invisible.004",
+			"translation":[
+				13,
+				3,
+				-4
 			]
 		}
 	],

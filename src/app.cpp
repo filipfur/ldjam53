@@ -59,6 +59,7 @@ void App::update(float dt)
     float camY = goptions::cameraRadius * 0.5f;
 
     // Camera is following the position of _playerControl
+    camera->setTarget(glm::mix(camera->position(), _playerControl->position(), dt));
     camera->setPosition(glm::mix(camera->position(), glm::vec3{camX, camY, camZ} + _playerControl->position(), dt));
 
     _playerControl->update(dt);
