@@ -12,6 +12,9 @@ include_directories(
 
 file(GLOB SOURCES
     testrotationgraph.cpp
+    ../../src/goptions.cpp
+    ../../src/level.cpp
+    ../../src/rotationgraph.cpp
 )
 
 add_executable(testrotationgraph ${SOURCES})

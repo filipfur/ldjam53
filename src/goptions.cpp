@@ -22,7 +22,7 @@
 namespace goptions
 {
 
-const float cubeSideLengths = 2.0f;
+const float cubeSideLength = 2.0f;
 const float cameraRadius = 16.0f;
 
 const float playerWalkSpeedMax = 6.0f;

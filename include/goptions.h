@@ -25,7 +25,7 @@ namespace goptions
 
 // Compile-time intialized in goptions.cpp
 
-extern const float cubeSideLengths;
+extern const float cubeSideLength;
 extern const float cameraRadius;
 
 extern const float playerWalkSpeedMax;
@@ -34,6 +34,14 @@ extern const float playerJumpAcceleration;
 extern const float playerJumpTime;
 
 extern const float gravity;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// CONSTANTS
+////////////////////////////////////////////////////////////////////////////////
+
+
+constexpr size_t numDimensions = 3;
 
 
 ////////////////////////////////////////////////////////////////////////////////
