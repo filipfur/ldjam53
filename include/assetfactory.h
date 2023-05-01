@@ -15,6 +15,7 @@ public:
         std::shared_ptr<lithium::Mesh> cube;
         std::shared_ptr<lithium::Mesh> screen;
         std::shared_ptr<lithium::Mesh> package;
+        std::shared_ptr<lithium::Mesh> longPackage;
     } _meshes;
 
     struct Textures

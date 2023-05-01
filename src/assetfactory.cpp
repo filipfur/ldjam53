@@ -48,6 +48,7 @@ void AssetFactory::loadMeshes()
     instance._meshes.screen.reset(new lithium::Mesh(AssetFactory::objectAttributes, screenMeshVertices, screenMeshIndices));
     instance._meshes.cube = lithium::tinyobjloader_load("assets/block.obj", objectAttributes);
     instance._meshes.package = lithium::tinyobjloader_load("assets/package/package.obj", objectAttributes);
+    instance._meshes.longPackage = lithium::tinyobjloader_load("assets/package/longpackage.obj", objectAttributes);
 }
 
 void AssetFactory::loadTextures()
