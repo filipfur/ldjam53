@@ -35,16 +35,19 @@ public:
 
     void handleStateTransitions();
 
-    std::vector<lithium::GameState>::iterator currentGameState()
+    std::map<GameStateType, lithium::GameState>::iterator currentGameState()
     {
-        return _gameStates.begin() + static_cast<int>(_currentGameState);
+        return  _gameStates.find(_currentGameState);
     }
 
 
 private:
+
+    void createLevel1();
+
     std::shared_ptr<Pipeline> _pipeline{nullptr};
     std::set<GameStateType> _stateTransitions;
-    std::vector<lithium::GameState> _gameStates;
+    std::map<GameStateType, lithium::GameState> _gameStates;
     GameStateType _currentGameState;
     std::unique_ptr<PlayerControl> _playerControl;
 };

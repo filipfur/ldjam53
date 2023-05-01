@@ -1,7 +1,7 @@
 # Blender v3.5.0 OBJ File: 'package.blend'
 # www.blender.org
 mtllib longpackage.mtl
-o Cube.001_Cube.002
+o LongPackage_Cube.003
 v 1.000000 1.000000 -3.000000
 v 1.000000 -1.000000 -3.000000
 v 1.000000 1.000000 3.000000

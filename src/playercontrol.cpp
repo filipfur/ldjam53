@@ -10,6 +10,7 @@ PlayerControl::PlayerControl(std::shared_ptr<Sprite> sprite, std::shared_ptr<lit
 
 void PlayerControl::update(float dt)
 {
+    _sprite->update(dt);
     State oldState = _state;
     bool grounded = onGround();
     if(grounded)
