@@ -30,6 +30,11 @@ public:
         return _state != JUMPING && _state != FALLING;
     }
 
+    const glm::vec3& position() const
+    {
+        return _sprite->position();
+    }
+
 private:
     std::shared_ptr<Sprite> _sprite;
     std::shared_ptr<lithium::Input::KeyCache> _keyCache;

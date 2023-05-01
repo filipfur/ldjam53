@@ -121,7 +121,9 @@ void App::update(float dt)
     float camZ = cos(t) * goptions::cameraRadius;
     // set camY so that it is truly isometric
     float camY = goptions::cameraRadius * 0.5f;
-    camera->setPosition(glm::vec3{camX, camY, camZ});
+
+    // Camera is following the position of _playerControl
+    camera->setPosition(glm::mix(camera->position(), glm::vec3{camX, camY, camZ} + _playerControl->position(), dt));
 
     _playerControl->update(dt);
 
