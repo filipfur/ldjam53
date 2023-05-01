@@ -35,6 +35,10 @@ extern const float playerJumpTime;
 
 extern const float gravity;
 
+extern const float cubeOffsetX;
+extern const float cubeOffsetY;
+extern const float cubeOffsetZ;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -52,5 +56,7 @@ constexpr size_t numDimensions = 3;
 // Requires constexpr
 
 // Compile-time intialized in goptions.cpp
+
+extern const float halfCubeSideLength;
 
 } // namespace goptions

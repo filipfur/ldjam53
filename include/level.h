@@ -31,6 +31,7 @@ constexpr float CUBE_SIDE_LENGTHS = 2.0;
 class Cube
 {
 public:
+    Cube() = delete;
     Cube(glm::vec3 pos);
     Cube(glm::ivec3 ipos);
 
@@ -45,8 +46,10 @@ private:
 class Face
 {
 public:
-    static constexpr size_t numNeightbors = (goptions::numDimensions - 1) * 2;
+    static constexpr size_t numPlaneDimensions = goptions::numDimensions - 1;
+    static constexpr size_t numNeightbors = numPlaneDimensions * 2;
 
+    Face() = delete;
     Face(Cube* cube, glm::ivec3 normal);
 
     const Cube* cube() const;

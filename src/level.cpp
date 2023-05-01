@@ -25,7 +25,7 @@ Cube::Cube(glm::vec3 pos) :
 }
 
 Cube::Cube(glm::ivec3 ipos) :
-    _pos(glm::vec3(ipos) * goptions::cubeSideLength)
+    _pos(glm::vec3(ipos) * goptions::cubeSideLength + glm::vec3(goptions::cubeOffsetX, goptions::cubeOffsetY, goptions::cubeOffsetZ))
 {
 }
 
@@ -37,9 +37,9 @@ glm::vec3 Cube::pos() const
 glm::ivec3 Cube::iPos() const
 {
     return glm::ivec3(
-        static_cast<int>(_pos.x / goptions::cubeSideLength + 0.5f),
-        static_cast<int>(_pos.y / goptions::cubeSideLength + 0.5f),
-        static_cast<int>(_pos.z / goptions::cubeSideLength + 0.5f));
+        static_cast<int>((_pos.x - goptions::cubeOffsetX) / goptions::cubeSideLength + 0.5f),
+        static_cast<int>((_pos.y - goptions::cubeOffsetY) / goptions::cubeSideLength + 0.5f),
+        static_cast<int>((_pos.z - goptions::cubeOffsetZ) / goptions::cubeSideLength + 0.5f));
 }
 
 Face::Face(Cube* cube, glm::ivec3 normal) :

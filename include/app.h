@@ -8,6 +8,7 @@
 #include "assetfactory.h"
 #include "glgamestate.h"
 #include "playercontrol.h"
+#include "rotationgraph.h"
 
 enum class GameStateType
 {
@@ -43,6 +44,8 @@ public:
 
 private:
 
+    void constructRotationGraph(std::vector<lithium::Node*>& nodes);
+
     void createLevel1();
 
     std::shared_ptr<Pipeline> _pipeline{nullptr};
@@ -50,4 +53,5 @@ private:
     std::map<GameStateType, lithium::GameState> _gameStates;
     GameStateType _currentGameState;
     std::unique_ptr<PlayerControl> _playerControl;
+    RotationGraph _rotationGraph;
 };
