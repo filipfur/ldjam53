@@ -53,7 +53,7 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
 
     glm::mat4 model{1.0f};
     model = glm::translate(model, glm::vec3{4.0f, 2.0f, 0.0f});
-    model = glm::rotate(model, glm::radians(90.0f), glm::vec3{0.0f, 1.0f, 0.0f});
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3{0.0f, 1.0f, 0.0f});
     longPackage->addInstance(model);
     longPackage->allocateBufferData();
     longPackage->linkBuffer({
