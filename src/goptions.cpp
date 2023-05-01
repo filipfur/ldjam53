@@ -27,7 +27,7 @@ const float cameraRadius = 16.0f;
 
 const float playerWalkSpeedMax = 6.0f;
 const float playerWalkAcceleration = 32.0f;
-const float playerJumpAcceleration = 64.0f * 4.0f;
+const float playerJumpAcceleration = 70.0f * 4.0f;
 const float playerJumpTime = 0.042f;
 
 const float gravity = 9.81f * 4.0f;

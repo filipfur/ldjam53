@@ -30,7 +30,7 @@ static const std::vector<GLfloat> screenMeshVertices = {
     1.0, -1.0, 0.0f, 	0.0f, 1.0f, 0.0f,	1.0, 0.0f
 };
 
-static const std::vector<GLfloat> billboardMeshVertices = {
+static const std::vector<GLfloat> spriteMeshVertices = {
     -0.5f, -0.0f, +0.0f, 	+0.0f, +1.0f, +0.0f,	+0.0f, +0.0f,
     -0.5f, +1.0f, +0.0f, 	+0.0f, +1.0f, +0.0f,	+0.0f, +1.0f,
     +0.5f, +1.0f, +0.0f,	+0.0f, +1.0f, +0.0f,	+1.0f, +1.0f,
@@ -46,9 +46,11 @@ void AssetFactory::loadMeshes()
 {
     AssetFactory& instance = getInstance();
     instance._meshes.screen.reset(new lithium::Mesh(AssetFactory::objectAttributes, screenMeshVertices, screenMeshIndices));
+    instance._meshes.sprite.reset(new lithium::Mesh(AssetFactory::objectAttributes, spriteMeshVertices, screenMeshIndices));
     instance._meshes.cube = lithium::tinyobjloader_load("assets/block.obj", objectAttributes);
     instance._meshes.package = lithium::tinyobjloader_load("assets/package/package.obj", objectAttributes);
     instance._meshes.longPackage = lithium::tinyobjloader_load("assets/package/longpackage.obj", objectAttributes);
+    instance._meshes.level1 = lithium::tinyobjloader_load("assets/package/level1.obj", objectAttributes);
 }
 
 void AssetFactory::loadTextures()

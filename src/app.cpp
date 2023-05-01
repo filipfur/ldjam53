@@ -1,6 +1,7 @@
 #include "app.h"
 #include "goptions.h"
 #include "sprite.h"
+#include "utility.h"
 
 App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Application::Mode::MULTISAMPLED_4X, false}
 {
@@ -14,16 +15,18 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
 
     auto longPackage = std::make_shared<lithium::InstancedObject<glm::mat4>>(AssetFactory::getMeshes()->longPackage,
         TextureArray{AssetFactory::getTextures()->packageDiffuse});
-    
 
-    auto playerSprite = std::make_shared<Sprite>(AssetFactory::getMeshes()->screen,
+    auto playerSprite = std::make_shared<Sprite>(AssetFactory::getMeshes()->sprite,
         TextureArray{AssetFactory::getTextures()->delivermanSheet}, glm::ivec2{32, 32});
     playerSprite->setPosition(glm::vec3{0.0f, 0.0f, 1.01f});
-    playerSprite->setScale(1.0f);
+    playerSprite->setScale(2.0f);
     playerSprite->setFramesPerSecond(5.0f);
     playerSprite->createAnimation("idle", {0, 0, 0, 1, 1});
     playerSprite->createAnimation("walk", {2, 3, 4, 5});
     playerSprite->setAnimation("idle");
+
+    auto level1 = std::make_shared<lithium::Object>(AssetFactory::getMeshes()->level1,
+        TextureArray{AssetFactory::getTextures()->packageDiffuse});
 
     //_pipeline->attach(object.get());
 
@@ -69,10 +72,21 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
     });
 
     auto firstScene = std::make_shared<lithium::Scene>();
-    firstScene->addObject(object);
-    firstScene->addObject(longPackage);
+    //firstScene->addObject(object);
+    //firstScene->addObject(longPackage);
     firstScene->addObject(playerSprite);
+    firstScene->addObject(level1);
     firstScene->attach(_pipeline);
+
+    auto& assets = AssetFactory::getInstance();
+    std::vector<lithium::Node*> nodes;
+    assets._gltfLoader.loadNodes("assets/package/level1.gltf", nodes);
+    for(auto node : nodes)
+    {
+        std::cout << "Node: " << node->name() << " [";
+        utility::printGLM(node->position(), 3);
+        std::cout << ']' << std::endl;
+    }
     
     lithium::GameState firstGameState;
     firstGameState.addScene(firstScene);
