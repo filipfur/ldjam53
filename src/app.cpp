@@ -9,8 +9,8 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
     AssetFactory::loadObjects();
     AssetFactory::loadFonts();
     _pipeline = std::make_shared<Pipeline>(defaultFrameBufferResolution());
-    auto object = std::make_shared<lithium::InstancedObject<glm::mat4>>(AssetFactory::getMeshes()->cube,
-        TextureArray{AssetFactory::getTextures()->logoDiffuse});
+    auto object = std::make_shared<lithium::InstancedObject<glm::mat4>>(AssetFactory::getMeshes()->package,
+        TextureArray{AssetFactory::getTextures()->packageDiffuse});
     object->setPosition(glm::vec3{0.0f});
     object->setScale(1.0f);
     //object->stage();
