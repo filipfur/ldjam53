@@ -8,10 +8,12 @@ Pipeline::Pipeline(const glm::ivec2& resolution) : lithium::RenderPipeline{resol
     _frameBuffer{std::make_shared<lithium::FrameBuffer>(resolution)}
 {
     enableDepthTesting();
+    enableStencilTesting();
     enableBlending();
     blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     enableMultisampling();
     enableFaceCulling();
+    stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     _blockShader = std::make_shared<lithium::ShaderProgram>("shaders/object.vert", "shaders/object.frag");
     _blockShader->setUniform("u_texture_0", 0);
@@ -20,6 +22,9 @@ Pipeline::Pipeline(const glm::ivec2& resolution) : lithium::RenderPipeline{resol
     _spriteShader = std::make_shared<lithium::ShaderProgram>("shaders/object.vert", "shaders/sprite.frag");
     _spriteShader->setUniform("u_texture_0", 0);
     _spriteShader->setUniform("u_projection", _camera->projection());
+
+    _normalShader = std::make_shared<lithium::ShaderProgram>("shaders/instance.vert", "shaders/normal.frag");
+    _normalShader->setUniform("u_projection", _camera->projection());
 
     _instanceShader = std::make_shared<lithium::ShaderProgram>("shaders/instance.vert", "shaders/object.frag");
     _instanceShader->setUniform("u_texture_0", 0);
@@ -51,7 +56,7 @@ Pipeline::Pipeline(const glm::ivec2& resolution) : lithium::RenderPipeline{resol
 
     _mainStage = addRenderStage(std::make_shared<lithium::RenderStage>(_frameBuffer, glm::ivec4{0, 0, resolution.x, resolution.y}, [this](){
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         _screenShader->use();
         AssetFactory().getMeshes()->screen->bind();
         glActiveTexture(GL_TEXTURE0);
@@ -65,9 +70,50 @@ Pipeline::Pipeline(const glm::ivec2& resolution) : lithium::RenderPipeline{resol
         _instanceShader->setUniform("u_view", _camera->view());
         _instanceGroup->render(_instanceShader.get());
 
+        _normalShader->setUniform("u_view", _camera->view());
+        clear(GL_DEPTH_BUFFER_BIT);
+        enableStencilWriting();
+
+        const glm::vec3 normalA{0.0f, 0.0f, 1.0f};
+        const glm::vec3 normalB{1.0f, 0.0f, 0.0f};
+
+        disableColorWriting();
+            _normalShader->setUniform("u_face_normal", normalA);
+            stencilFunc(GL_ALWAYS, 1, 0xFF);
+            _instanceGroup->render(_normalShader.get());
+
+            _normalShader->setUniform("u_face_normal", normalB);
+            stencilFunc(GL_ALWAYS, 2, 0xFF);
+            _instanceGroup->render(_normalShader.get());
+        enableColorWriting();
+
+
+        stencilFunc(GL_EQUAL, 1, 0xFF);
         _spriteShader->setUniform("u_view", _camera->view());
         _spriteShader->setUniform("u_time", _time);
         _spriteGroup->render(_spriteShader.get());
+
+        stencilFunc(GL_EQUAL, 2, 0xFF);
+        glm::vec3 oldSpritePos;
+        _spriteGroup->forEach([&oldSpritePos, &normalA, &normalB](lithium::Renderable* renderable){
+            auto sprite = dynamic_cast<Sprite*>(renderable);
+            oldSpritePos = sprite->position();
+
+            glm::ivec3 ivec{oldSpritePos};
+            glm::vec3 npos = glm::vec3(ivec.x, oldSpritePos.y, ivec.z) + normalB * 1.01f;
+            float len = glm::length(npos - oldSpritePos);
+            sprite->setPosition(npos + normalA * len);
+
+            sprite->setRotation(sprite->rotation() + glm::vec3{0.0f, 90.0f, 0.0f});
+        });
+        _spriteGroup->render(_spriteShader.get());
+        _spriteGroup->forEach([&oldSpritePos](lithium::Renderable* renderable){
+            auto sprite = dynamic_cast<Sprite*>(renderable);
+            sprite->setPosition(oldSpritePos);
+            sprite->setRotation(sprite->rotation() - glm::vec3{0.0f, 90.0f, 0.0f});
+        });
+
+        stencilFunc(GL_ALWAYS, 0, 0xFF);
     }));
 
     _finalStage = addRenderStage(std::make_shared<lithium::RenderStage>(nullptr, glm::ivec4{0, 0, resolution.x, resolution.y}, [this](){

@@ -50,6 +50,7 @@ void AssetFactory::loadMeshes()
     instance._meshes.cube = lithium::tinyobjloader_load("assets/block.obj", objectAttributes);
     instance._meshes.package = lithium::tinyobjloader_load("assets/package/package.obj", objectAttributes);
     instance._meshes.longPackage = lithium::tinyobjloader_load("assets/package/longpackage.obj", objectAttributes);
+    instance._meshes.slot = lithium::tinyobjloader_load("assets/package/slot.obj", objectAttributes);
     instance._meshes.level1 = lithium::tinyobjloader_load("assets/package/level1.obj", objectAttributes);
 }
 

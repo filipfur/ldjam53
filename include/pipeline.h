@@ -30,6 +30,7 @@ public:
 
 private:
     std::shared_ptr<lithium::ShaderProgram> _blockShader{nullptr};
+    std::shared_ptr<lithium::ShaderProgram> _normalShader{nullptr};
     std::shared_ptr<lithium::ShaderProgram> _spriteShader{nullptr};
     std::shared_ptr<lithium::ShaderProgram> _instanceShader{nullptr};
     std::shared_ptr<lithium::ShaderProgram> _msaaShader{nullptr};

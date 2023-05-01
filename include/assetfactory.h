@@ -17,6 +17,7 @@ public:
         std::shared_ptr<lithium::Mesh> sprite;
         std::shared_ptr<lithium::Mesh> package;
         std::shared_ptr<lithium::Mesh> longPackage;
+        std::shared_ptr<lithium::Mesh> slot;
         std::shared_ptr<lithium::Mesh> level1;
     } _meshes;
 

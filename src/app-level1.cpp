@@ -9,6 +9,9 @@ void App::createLevel1()
     auto longPackage = std::make_shared<lithium::InstancedObject<glm::mat4>>(AssetFactory::getMeshes()->longPackage,
         TextureArray{AssetFactory::getTextures()->packageDiffuse});
 
+    auto slot = std::make_shared<lithium::InstancedObject<glm::mat4>>(AssetFactory::getMeshes()->slot,
+        TextureArray{AssetFactory::getTextures()->packageDiffuse});
+
     /*for(int i{0}; i < 5; ++i)
     {
         glm::mat4 model{1.0f};
@@ -67,6 +70,9 @@ void App::createLevel1()
             case 2:
                 longPackage->addInstance(model);
                 break;
+            case 3:
+                slot->addInstance(model);
+                break;
         }
     }
     object->allocateBufferData();
@@ -83,10 +89,18 @@ void App::createLevel1()
         lithium::AttributePointer<GL_FLOAT>{2, 4, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4))},
         lithium::AttributePointer<GL_FLOAT>{3, 4, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4))},
     });
+    slot->allocateBufferData();
+    slot->linkBuffer({
+        lithium::AttributePointer<GL_FLOAT>{0, 4, sizeof(glm::mat4), (void*)0},
+        lithium::AttributePointer<GL_FLOAT>{1, 4, sizeof(glm::mat4), (void*)(sizeof(glm::vec4))},
+        lithium::AttributePointer<GL_FLOAT>{2, 4, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4))},
+        lithium::AttributePointer<GL_FLOAT>{3, 4, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4))},
+    });
 
     auto firstScene = std::make_shared<lithium::Scene>();
     firstScene->addObject(object);
     firstScene->addObject(longPackage);
+    firstScene->addObject(slot);
     //firstScene->addObject(playerSprite);
     //firstScene->addObject(level1);
     firstScene->attach(_pipeline);
