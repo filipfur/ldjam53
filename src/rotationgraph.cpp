@@ -20,10 +20,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-RotationGraph::RotationGraph(std::vector<Cube*> cubes) :
-    _cubes(),
-    _faces()
+void RotationGraph::construct(std::vector<Cube*> cubes)
 {
+    _cubes.clear();
+    _faces.clear();
+
     // Populate _cubes
     for (auto& cube : cubes) {
         glm::ivec3 cubeIpos = cube->iPos();
@@ -116,12 +117,12 @@ RotationGraph::RotationGraph(std::vector<Cube*> cubes) :
     }
 }
 
-const CubeMap& RotationGraph::getCubes() const
+CubeMap& RotationGraph::cubes()
 {
     return _cubes;
 }
 
-const FaceMap& RotationGraph::getFaces() const
+FaceMap& RotationGraph::faces()
 {
     return _faces;
 }

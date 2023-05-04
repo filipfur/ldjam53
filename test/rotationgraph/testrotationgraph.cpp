@@ -10,10 +10,11 @@ int main(int argc, const char* argv[])
     cubes.push_back(new Cube(glm::ivec3(0, 0, 0)));
     cubes.push_back(new Cube(glm::ivec3(1, 0, 0)));
     cubes.push_back(new Cube(glm::ivec3(1, 1, 0)));
-    RotationGraph rg = RotationGraph(cubes);
+    RotationGraph rg;
+    rg.construct(cubes);
 
     // using CubeMapKey = glm::ivec3;
-    for (auto cubeIt = rg.getCubes().begin(); cubeIt != rg.getCubes().end(); cubeIt++)
+    for (auto cubeIt = rg.cubes().begin(); cubeIt != rg.cubes().end(); cubeIt++)
     {
         glm::ivec3 cubeIpos = cubeIt->first;
         Cube* cube = cubeIt->second;
@@ -21,7 +22,7 @@ int main(int argc, const char* argv[])
     }
 
     // using FaceMapKey = std::pair<const glm::ivec3, const glm::ivec3>;
-    for (auto faceIt = rg.getFaces().begin(); faceIt != rg.getFaces().end(); faceIt++)
+    for (auto faceIt = rg.faces().begin(); faceIt != rg.faces().end(); faceIt++)
     {
         glm::ivec3 cubeIpos = faceIt->first.first;
         glm::ivec3 faceNormal = faceIt->first.second;

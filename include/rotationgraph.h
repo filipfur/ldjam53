@@ -75,10 +75,10 @@ using FaceMap = std::map<
 class RotationGraph
 {
 public:
-    RotationGraph(std::vector<Cube*> cubes);
+    void construct(std::vector<Cube*> cubes);
 
-    const CubeMap& getCubes() const;
-    const FaceMap& getFaces() const;
+    CubeMap& cubes();
+    FaceMap& faces();
 
 private:
     CubeMap _cubes;

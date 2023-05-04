@@ -2,7 +2,9 @@
 
 #include "goptions.h"
 
-PlayerControl::PlayerControl(std::shared_ptr<Sprite> sprite, std::shared_ptr<lithium::Input> input) : _sprite(sprite)
+PlayerControl::PlayerControl(std::shared_ptr<Sprite> sprite, std::shared_ptr<lithium::Input> input) :
+    _sprite(sprite),
+    _faces()
 {
     _keyCache = std::make_shared<lithium::Input::KeyCache>(std::initializer_list<int>{GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_SPACE});
     input->setKeyCache(_keyCache);
@@ -93,4 +95,9 @@ void PlayerControl::update(float dt)
     }
 
     _sprite->setFlipped(_direction == LEFT);
+}
+
+void PlayerControl::setFaceMap(FaceMap* faces, glm::vec3 playerPos)
+{
+    _faces = faces;
 }

@@ -32,10 +32,16 @@ const float playerJumpTime = 0.042f;
 
 const float gravity = 9.81f * 4.0f;
 
+const float cubeOffsetX = 0.0f * cubeSideLength;
+const float cubeOffsetY = 0.5f * cubeSideLength;
+const float cubeOffsetZ = 0.0f * cubeSideLength;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // DERIVED CONSTANTS
 ////////////////////////////////////////////////////////////////////////////////
 
+
+const float halfCubeSideLength = cubeSideLength / 2;
 
 } // namespace goptions

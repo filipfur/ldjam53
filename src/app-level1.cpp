@@ -51,6 +51,7 @@ void App::createLevel1()
     auto& assets = AssetFactory::getInstance();
     std::vector<lithium::Node*> nodes;
     assets._gltfLoader.loadNodes("assets/package/level1.gltf", nodes);
+    constructRotationGraph(nodes);
     for(auto node : nodes)
     {
         std::cout << "Node: " << node->name() << " [";

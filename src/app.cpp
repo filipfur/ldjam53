@@ -2,7 +2,9 @@
 #include "goptions.h"
 #include "sprite.h"
 
-App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Application::Mode::MULTISAMPLED_4X, false}
+App::App() :
+    Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Application::Mode::MULTISAMPLED_4X, false},
+    _rotationGraph()
 {
     AssetFactory::loadMeshes();
     AssetFactory::loadTextures();
@@ -34,6 +36,7 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
     _currentGameState = GameStateType::MAIN;
 
     _playerControl = std::make_unique<PlayerControl>(playerSprite, input());
+    _playerControl->setFaceMap(&_rotationGraph.faces(), playerSprite->position());
 
     printf("%s\n", glGetString(GL_VERSION));
 }
@@ -81,4 +84,13 @@ void App::handleStateTransitions()
         currentGameState()->second.enter();
         //_pipeline->updatePointLights();
     }
+}
+
+void App::constructRotationGraph(std::vector<lithium::Node*>& nodes)
+{
+    std::vector<Cube*> cubes;
+    for (auto& node : nodes) {
+        cubes.push_back(new Cube(node->position()));
+    }
+    _rotationGraph.construct(cubes);
 }
