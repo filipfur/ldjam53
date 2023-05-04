@@ -86,6 +86,11 @@ public:
         return _currentAnimation->first;
     }
 
+    void setZIndex(float zIndex)
+    {
+        _zIndex = zIndex;
+    }
+
 private:
     std::map<std::string, Animation> _animations;
     std::map<std::string, Animation>::iterator _currentAnimation;
@@ -97,5 +102,6 @@ private:
     float _framesPerSecond;
     float _frameInterval{0.0f};
     float _frameDuration{0.0f};
+    float _zIndex{0.0f};
     bool _flipped{false};
 };

@@ -97,10 +97,30 @@ void App::createLevel1()
         lithium::AttributePointer<GL_FLOAT>{3, 4, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4))},
     });
 
+
+    auto letterSprite = std::make_shared<Sprite>(AssetFactory::getMeshes()->sprite,
+        TextureArray{AssetFactory::getTextures()->letterDiffuse}, glm::ivec2{32, 32});
+    letterSprite->setPosition(glm::vec3{4.0f, 0.0f, 1.0f});
+    letterSprite->setScale(2.0f);
+    letterSprite->createAnimation("idle", {0});
+    letterSprite->setAnimation("idle");
+    letterSprite->setZIndex(-0.02f);
+
+    letterSprite->setUpdateCallback([](lithium::Updateable* u, float time, float dt){
+        auto sprite = dynamic_cast<Sprite*>(u);
+        sprite->setScale(1.2f + std::sin(time * 6.0f) * 0.4f);
+        //rotate around the x axis
+        sprite->setRotation(glm::vec3{0.0f, 0.0f, sin(time * 8.0f) * 15.0f});
+        auto p0 = sprite->position();
+        sprite->setPosition(glm::vec3{p0.x, 0.5f + sin(time * 4.0f) * 0.2f, p0.z});
+        return true;
+    });
+
     auto firstScene = std::make_shared<lithium::Scene>();
     firstScene->addObject(object);
     firstScene->addObject(longPackage);
     firstScene->addObject(slot);
+    firstScene->addObject(letterSprite);
     //firstScene->addObject(playerSprite);
     //firstScene->addObject(level1);
     firstScene->attach(_pipeline);

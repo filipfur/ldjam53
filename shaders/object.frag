@@ -9,12 +9,14 @@ uniform sampler2D u_texture_0;
 uniform vec4 u_color;
 uniform float u_time;
 uniform vec3 u_view_pos;
+uniform vec2 u_uv_offset;
 
 out vec4 fragColor;
 
 in vec2 texCoord;
 in vec3 normal;
 in vec3 fragPos;
+in float instanceId;
 
 void calcLight(inout float diffuse, inout float specular, inout float fresnel, in vec3 lightPos, in float strength)
 {
@@ -39,8 +41,7 @@ void calcLight(inout float diffuse, inout float specular, inout float fresnel, i
 
 void main()
 {
-    
-    vec4 color = texture(u_texture_0, texCoord) * u_color;
+    vec4 color = texture(u_texture_0, texCoord + u_uv_offset) * u_color;
     vec3 ambient = color.rgb * 0.2;
     float exposure = 1.0;
 

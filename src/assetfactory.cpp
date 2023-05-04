@@ -59,7 +59,8 @@ void AssetFactory::loadTextures()
     AssetFactory& instance = getInstance();
     instance._textures.logoDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/Kraxbox_logo_lithium_metal_2ff2069c-b84a-426c-bf92-e9831105a5df.png", GL_SRGB_ALPHA, GL_RGBA)->setFilter(GL_NEAREST));
     instance._textures.delivermanSheet.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/deliverman.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
-    instance._textures.packageDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/package/package.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
+    instance._textures.packageDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/package/packages.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
+    instance._textures.letterDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/letter.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
 }
 
 void AssetFactory::loadObjects()

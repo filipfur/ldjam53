@@ -8,6 +8,7 @@ uniform mat4 u_view;
 uniform mat4 u_projection;
 uniform mat4 u_model;
 uniform float u_time;
+uniform float u_z_index;
 
 out vec2 texCoord;
 out vec3 normal;
@@ -19,5 +20,8 @@ void main()
     mat3 normalMatrix = transpose(inverse(mat3(u_model)));
     normal = normalize(normalMatrix * aNormal);
     fragPos = vec3(u_model * vec4(aPos, 1.0));
+    vec3 cameraDirection = -vec3(u_view[0][2], u_view[1][2], u_view[2][2]);
+    //translate closer to camera by u_z_index
+    fragPos += cameraDirection * u_z_index;
     gl_Position = u_projection * u_view * vec4(fragPos, 1.0);
 }

@@ -32,8 +32,13 @@ void main()
     /*calculate uv based on region dimension and region position*/
     uv = uv * u_region_dimension + u_region_position;
 
-    vec4 color = texture2D(u_texture_0, uv) * u_color;
+    vec4 color = texture2D(u_texture_0, uv);
 
-    fragColor = color;
+    if(color.a < 0.1)
+    {
+        discard;
+    }
+
+    fragColor = color * u_color;
     fragColor.rgb = pow(fragColor.rgb, vec3(1.0/2.2));
 }

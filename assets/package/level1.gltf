@@ -26,7 +26,8 @@
 				15,
 				16,
 				17,
-				18
+				18,
+				19
 			]
 		}
 	],
@@ -260,6 +261,15 @@
 				0.009999999776482582,
 				2
 			]
+		},
+		{
+			"mesh":0,
+			"name":"Package.013",
+			"translation":[
+				4,
+				1,
+				4
+			]
 		}
 	],
 	"materials":[
@@ -342,8 +352,8 @@
 	"images":[
 		{
 			"mimeType":"image/png",
-			"name":"package",
-			"uri":"package.png"
+			"name":"packages",
+			"uri":"packages.png"
 		}
 	],
 	"accessors":[

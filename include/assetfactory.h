@@ -26,6 +26,7 @@ public:
         std::shared_ptr<lithium::ImageTexture> logoDiffuse;
         std::shared_ptr<lithium::ImageTexture> delivermanSheet;
         std::shared_ptr<lithium::ImageTexture> packageDiffuse;
+        std::shared_ptr<lithium::ImageTexture> letterDiffuse;
     } _textures;
 
     struct Objects

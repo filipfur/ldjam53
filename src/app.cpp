@@ -12,12 +12,14 @@ App::App() : Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Applicat
 
     auto playerSprite = std::make_shared<Sprite>(AssetFactory::getMeshes()->sprite,
         TextureArray{AssetFactory::getTextures()->delivermanSheet}, glm::ivec2{32, 32});
-    playerSprite->setPosition(glm::vec3{0.0f, 0.0f, 1.01f});
+    playerSprite->setPosition(glm::vec3{0.0f, 0.0f, 1.0f});
     playerSprite->setScale(2.0f);
-    playerSprite->setFramesPerSecond(5.0f);
+    playerSprite->setFramesPerSecond(12.0f);
     playerSprite->createAnimation("idle", {0, 0, 0, 1, 1});
     playerSprite->createAnimation("walk", {2, 3, 4, 5});
     playerSprite->setAnimation("idle");
+    playerSprite->setZIndex(-0.01f);
+    playerSprite->setGroupId(Pipeline::PLAYER);
     _pipeline->attach(playerSprite.get());
     playerSprite->stage();
 

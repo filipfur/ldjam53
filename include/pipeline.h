@@ -11,7 +11,7 @@ public:
     enum Group
     {
         NONE,
-        SPRITE
+        PLAYER
     };
 
     Pipeline(const glm::ivec2& resolution);
@@ -38,6 +38,7 @@ private:
     std::shared_ptr<lithium::SimpleCamera> _camera{nullptr};
     
     std::shared_ptr<lithium::RenderGroup> _instanceGroup;
+    std::shared_ptr<lithium::RenderGroup> _playerGroup;
     std::shared_ptr<lithium::RenderGroup> _spriteGroup;
     std::shared_ptr<lithium::RenderGroup> _mainGroup;
 
