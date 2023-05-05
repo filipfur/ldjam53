@@ -3,8 +3,7 @@
 #include "goptions.h"
 
 PlayerControl::PlayerControl(std::shared_ptr<Sprite> sprite, std::shared_ptr<lithium::Input> input) :
-    _sprite(sprite),
-    _faces()
+    _sprite(sprite)
 {
     _keyCache = std::make_shared<lithium::Input::KeyCache>(std::initializer_list<int>{GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_SPACE});
     input->setKeyCache(_keyCache);
@@ -19,52 +18,54 @@ void PlayerControl::update(float dt)
     {
         if(_keyCache->isPressed(GLFW_KEY_A) && (_direction == LEFT || _state == IDLE))
         {
-            _delta.x += -1.0f * goptions::playerWalkAcceleration * dt;
-            _delta.x = std::max(_delta.x, -goptions::playerWalkSpeedMax);
+            increaseSpeedRight(-1.0f * goptions::playerWalkAcceleration * dt);
+            setSpeedRight(std::max(speedRight(), -goptions::playerWalkSpeedMax));
             _state = WALKING;
             _direction = LEFT;
         }
         else if(_keyCache->isPressed(GLFW_KEY_D) && (_direction == RIGHT || _state == IDLE))
         {
-            _delta.x += 1.0f * goptions::playerWalkAcceleration * dt;
-            _delta.x = std::min(_delta.x, goptions::playerWalkSpeedMax);
+            increaseSpeedRight(1.0f * goptions::playerWalkAcceleration * dt);
+            setSpeedRight(std::min(speedRight(), goptions::playerWalkSpeedMax));
             _state = WALKING;
             _direction = RIGHT;
         }
         else
         {
-            _delta.x *= 0.8f;
-            if(_delta.x * _delta.x < 1)
+            float sr = speedRight();
+            float newSr = sr * 0.8f;
+            if(sr * sr < 1)
             {
-                _delta.x = 0;
+                newSr = 0;
                 _state = IDLE;
             }
+            setSpeedRight(newSr);
         }
-        _delta.y = 0;
+        setSpeedUp(0);
         if(_keyCache->isPressed(GLFW_KEY_SPACE))
         {
             _state = JUMPING;
             _jumpDuration = goptions::playerJumpTime;
-            _delta.x *= 0.9f;
+            setSpeedRight(speedRight() * 0.9f);
         }
     }
     else
     {
         if(_state == JUMPING)
         {
-            _delta.y += goptions::playerJumpAcceleration * dt;
+            increaseSpeedUp(goptions::playerJumpAcceleration * dt);
             _jumpDuration -= dt;
             if(_jumpDuration <= 0)
             {
                 _state = FALLING;
             }
         }
-        _delta.y -= goptions::gravity * dt;
+        increaseSpeedUp(-goptions::gravity * dt);
 
-        _delta.x = glm::mix(_delta.x, 0.0f, dt * 0.3f);
+        setSpeedRight(glm::mix(speedRight(), 0.0f, dt * 0.3f));
     }
 
-    _sprite->setPosition(_sprite->position() + _delta * dt);
+    move(_velocity * dt);
 
     if(!grounded)
     {
@@ -97,7 +98,42 @@ void PlayerControl::update(float dt)
     _sprite->setFlipped(_direction == LEFT);
 }
 
+void PlayerControl::move(glm::vec3 deltaPosition)
+{
+    _sprite->setPosition(_sprite->position() + deltaPosition);
+}
+
 void PlayerControl::setFaceMap(FaceMap* faces, glm::vec3 playerPos)
 {
     _faces = faces;
+}
+
+void PlayerControl::increaseSpeedRight(float increase)
+{
+    _velocity += increase * _rightDirection;
+}
+
+void PlayerControl::increaseSpeedUp(float increase)
+{
+    _velocity += increase * _upDirection;
+}
+
+float PlayerControl::speedRight() const
+{
+    return glm::dot(_velocity, _rightDirection);
+}
+
+float PlayerControl::speedUp() const
+{
+    return glm::dot(_velocity, _upDirection);
+}
+
+void PlayerControl::setSpeedRight(float speed)
+{
+    _velocity += (speed - speedRight()) * _rightDirection;
+}
+
+void PlayerControl::setSpeedUp(float speed)
+{
+    _velocity += (speed - speedUp()) * _upDirection;
 }
