@@ -42,7 +42,7 @@ void calcLight(inout float diffuse, inout float specular, inout float fresnel, i
 void main()
 {
     vec4 color = texture(u_texture_0, texCoord + u_uv_offset) * u_color;
-    vec3 ambient = color.rgb * 0.2;
+    vec3 ambient = color.rgb * 1.0;
     float exposure = 1.0;
 
     float diffuse = 0.0;
