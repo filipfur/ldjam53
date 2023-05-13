@@ -35,9 +35,13 @@ extern const float playerJumpTime;
 
 extern const float gravity;
 
+// Offset from the origin to the middle of the cube with iPos (integer position? index-position?) (0, 0, 0)
 extern const float cubeOffsetX;
 extern const float cubeOffsetY;
 extern const float cubeOffsetZ;
+
+extern const float characterWidth;
+extern const float characterHeight;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -46,6 +50,7 @@ extern const float cubeOffsetZ;
 
 
 constexpr size_t numDimensions = 3;
+constexpr size_t numFacesAroundTraversableCorner = 4;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +59,7 @@ constexpr size_t numDimensions = 3;
 
 
 // Requires constexpr
+constexpr size_t numPlaneDimensions = numDimensions - 1;
 
 // Compile-time intialized in goptions.cpp
 
