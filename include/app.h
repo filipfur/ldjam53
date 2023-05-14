@@ -8,7 +8,9 @@
 #include "assetfactory.h"
 #include "glgamestate.h"
 #include "playercontrol.h"
-#include "rotationgraph.h"
+#include "ecssystem.h"
+#include "component.h"
+#include "ex/gltextrenderer.h"
 
 enum class GameStateType
 {
@@ -44,14 +46,18 @@ public:
 
 private:
 
-    void constructRotationGraph(std::vector<lithium::Node*>& nodes);
-
     void createLevel1();
 
+    glm::vec3 rightVector{1.0f, 0.0f, 0.0f};
     std::shared_ptr<Pipeline> _pipeline{nullptr};
     std::set<GameStateType> _stateTransitions;
     std::map<GameStateType, lithium::GameState> _gameStates;
     GameStateType _currentGameState;
     std::unique_ptr<PlayerControl> _playerControl;
-    RotationGraph _rotationGraph;
+    float _cameraViewAngle{glm::pi<float>() * 0.25f};
+    std::set<ecs::Entity*> _entities;
+    ecs::System<const component::Time, const component::Collider> _cubeCollisionSystem;
+    lithium::ExTextRenderer _textRenderer;
+    bool _leftSide{true};
+    std::shared_ptr<lithium::Object> _currentCubeObject;
 };

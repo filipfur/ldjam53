@@ -50,6 +50,7 @@ void AssetFactory::loadMeshes()
     instance._meshes.cube = lithium::tinyobjloader_load("assets/block.obj", objectAttributes);
     instance._meshes.package = lithium::tinyobjloader_load("assets/package/package.obj", objectAttributes);
     instance._meshes.longPackage = lithium::tinyobjloader_load("assets/package/longpackage.obj", objectAttributes);
+    instance._meshes.beam = lithium::tinyobjloader_load("assets/package/beam.obj", objectAttributes);
     instance._meshes.slot = lithium::tinyobjloader_load("assets/package/slot.obj", objectAttributes);
     instance._meshes.level1 = lithium::tinyobjloader_load("assets/package/level1.obj", objectAttributes);
 }
@@ -58,9 +59,10 @@ void AssetFactory::loadTextures()
 {
     AssetFactory& instance = getInstance();
     instance._textures.logoDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/Kraxbox_logo_lithium_metal_2ff2069c-b84a-426c-bf92-e9831105a5df.png", GL_SRGB_ALPHA, GL_RGBA)->setFilter(GL_NEAREST));
-    instance._textures.delivermanSheet.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/deliverman.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
-    instance._textures.packageDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/package/packages.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
+    instance._textures.delivermanSheet.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/player/player.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
+    instance._textures.packageDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/package64/packages.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
     instance._textures.letterDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/letter.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
+    instance._textures.righteousDiffuse.reset(lithium::ImageTexture::load("assets/righteous/Righteous.png", GL_RGB, GL_RGBA, 1, false));
 }
 
 void AssetFactory::loadObjects()
@@ -71,6 +73,7 @@ void AssetFactory::loadObjects()
 void AssetFactory::loadFonts()
 {
     AssetFactory& instance = getInstance();
+    instance._fonts.righteousFont = std::make_shared<lithium::Font>(instance._textures.righteousDiffuse, "assets/righteous/Righteous.json");
 }
 
 const AssetFactory::Meshes* AssetFactory::getMeshes()
