@@ -30,6 +30,7 @@ extern const float cameraRadius;
 
 extern const float playerWalkSpeedMax;
 extern const float playerWalkAcceleration;
+extern const float playerAirWalkAcceleration;
 extern const float playerJumpAcceleration;
 extern const float playerJumpTime;
 

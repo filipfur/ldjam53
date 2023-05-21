@@ -19,19 +19,16 @@ void PlayerControl::update(float dt)
     State oldState = _state;
     if(onGround())
     {
-        if(_keyCache->isPressed(GLFW_KEY_A) && (_direction == LEFT || _state == IDLE))
+        float dirSign = (
+            _keyCache->isPressed(GLFW_KEY_D) && (_direction == RIGHT || _state == IDLE) ?  1.0f :
+            _keyCache->isPressed(GLFW_KEY_A) && (_direction == LEFT  || _state == IDLE) ? -1.0f :
+            0.0f);
+        if (dirSign)
         {
-            increaseSpeedRight(-1.0f * goptions::playerWalkAcceleration * dt);
-            setSpeedRight(std::max(speedRight(), -goptions::playerWalkSpeedMax));
+            increaseSpeedRight(dirSign * goptions::playerWalkAcceleration * dt);
+            setSpeedRight(dirSign * std::min(dirSign * speedRight(), goptions::playerWalkSpeedMax));
             _state = WALKING;
-            _direction = LEFT;
-        }
-        else if(_keyCache->isPressed(GLFW_KEY_D) && (_direction == RIGHT || _state == IDLE))
-        {
-            increaseSpeedRight(1.0f * goptions::playerWalkAcceleration * dt);
-            setSpeedRight(std::min(speedRight(), goptions::playerWalkSpeedMax));
-            _state = WALKING;
-            _direction = RIGHT;
+            _direction = dirSign > 0.0f ? RIGHT : LEFT;
         }
         else
         {
@@ -61,6 +58,15 @@ void PlayerControl::update(float dt)
             {
                 _state = FALLING;
             }
+        }
+        float dirSign = (
+            _keyCache->isPressed(GLFW_KEY_D) ?  1.0f :
+            _keyCache->isPressed(GLFW_KEY_A) ? -1.0f :
+            0.0f);
+        if (dirSign)
+        {
+            increaseSpeedRight(dirSign * goptions::playerAirWalkAcceleration * dt);
+            setSpeedRight(dirSign * std::min(dirSign * speedRight(), goptions::playerWalkSpeedMax));
         }
         setSpeedRight(glm::mix(speedRight(), 0.0f, dt * 0.3f));
     }
@@ -140,7 +146,11 @@ void PlayerControl::move(float dt)
             absDeltaPos2[dimIdx] = std::abs(deltaPos2[dimIdx]);
             for (int signIdx = 0; signIdx < 2; signIdx++) {
                 neighborss[dimIdx][signIdx] = currentFace->neighbor(currentFace->spaceDirectionToEdgeIndex(iVecMult(signIdxToSign(signIdx), currentPlayerDimensionDirections[dimIdx])));
-                edgeTraversable[dimIdx][signIdx] = neighborss[dimIdx][signIdx]->normal() == currentFace->normal() || dimIdx == HORIZONTAL;
+                edgeTraversable[dimIdx][signIdx] = (
+                    neighborss[dimIdx][signIdx]->normal() == currentFace->normal() ||  // The player can always traverse to neighboring faces with the same normal
+                    dimIdx == HORIZONTAL ||  // Player should be able to traverse over horizontal edges
+                    currentCubeIPos == glm::ivec3(0) && signIdx == 1  // A "glitch" in the first cube
+                );
             }
             neighbors[dimIdx] = neighborss[dimIdx][signToSignIdx(pSign(deltaPos2[dimIdx]))];
             seminormalizedCornerDirection += iVecMult(sign(deltaPos2[dimIdx]), currentPlayerDimensionDirections[dimIdx]);
