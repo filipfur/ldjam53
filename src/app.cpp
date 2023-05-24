@@ -136,9 +136,10 @@ void App::update(float dt)
     bool headCollided{false};
     bool footCurveCollided{false};
     bool roofCollided{false};
+    bool curveCollided{false};
     {
         lithium::TimeMeasure::Handle handle2{lithium::TimeMeasure::start("player x cube collision", false)};
-        _cubeCollisionSystem.update(_entities, [this, &collided, &headCollided, &footCollided, &footCurveCollided, &roofCollided](ecs::Entity& entity, const Time& time, const Collider& collider) {
+        _cubeCollisionSystem.update(_entities, [this, &collided, &headCollided, &footCollided, &footCurveCollided, &roofCollided, &curveCollided](ecs::Entity& entity, const Time& time, const Collider& collider) {
             static int collisionId = -1;
             static lithium::Collision collision;
             const glm::vec3 bodyPos = _playerControl->position() + glm::vec3{0.0f, 0.4f, 0.0f};
@@ -156,6 +157,10 @@ void App::update(float dt)
                 }
                 lastCollision = &collider;
                 collided = true;
+            }
+            if(collider.geometry->intersect(bodyPos + _playerControl->rightOrthogonal()))
+            {
+                curveCollided = true;
             }
             const glm::vec3 footPos = _playerControl->position() + glm::vec3{0.0f, -0.01f, 0.0f};
             const glm::vec3 footCurve = footPos + _playerControl->rightOrthogonal();
@@ -186,7 +191,7 @@ void App::update(float dt)
         });
     }
 
-    if(!collided && lastCollision)
+    if((!collided || curveCollided) && lastCollision)
     {
         //std::cout << "Time to rotate!!" << std::endl;
         glm::vec3 p0 = lastCollision->geometry->position();
@@ -282,8 +287,9 @@ void App::handleStateTransitions()
 {
     if(!_stateTransitions.empty())
     {
-        currentGameState()->second.exit();
-        _currentGameState = *_stateTransitions.begin();
+        GameStateType nextState = *_stateTransitions.begin();
+        currentGameState()->second.exit(_gameStates.at(nextState));
+        _currentGameState = nextState;
         _stateTransitions.erase(_stateTransitions.begin());
         currentGameState()->second.enter();
         //_pipeline->updatePointLights();

@@ -4,8 +4,8 @@
 #include "sprite.h"
 
 Pipeline::Pipeline(const glm::ivec2& resolution) : lithium::RenderPipeline{resolution},
-    _camera{new lithium::SimpleCamera(glm::perspective(glm::radians(45.0f), (float)resolution.x / (float)resolution.y, 0.1f, 100.0f))},
-    //_camera{new lithium::SimpleCamera(glm::ortho(-resolution.x * 0.005f, resolution.x * 0.005f, -resolution.y * 0.005f, resolution.y * 0.005f, 0.1f, 100.0f))},
+    //_camera{new lithium::SimpleCamera(glm::perspective(glm::radians(45.0f), (float)resolution.x / (float)resolution.y, 0.1f, 100.0f))},
+    _camera{new lithium::SimpleCamera(glm::ortho(-resolution.x * 0.005f, resolution.x * 0.005f, -resolution.y * 0.005f, resolution.y * 0.005f, 0.1f, 100.0f))},
     _frameBuffer{std::make_shared<lithium::FrameBuffer>(resolution)}
 {
     enableDepthTesting();
