@@ -137,7 +137,6 @@ void PlayerControl::move(float dt)
         bool edgeTraversable[goptions::numPlaneDimensions][2];
         bool edgeAndCornerTraversable[goptions::numPlaneDimensions];
 
-        glm::ivec3 seminormalizedCornerDirection{0};
         for (int dimIdx = 0; dimIdx < goptions::numPlaneDimensions; dimIdx++) {
             deltaPos2[dimIdx] = glm::dot(deltaPosition, currentPlayerDimensionDirections[dimIdx]);
             absDeltaPos2[dimIdx] = std::abs(deltaPos2[dimIdx]);
@@ -150,14 +149,7 @@ void PlayerControl::move(float dt)
                 );
             }
             neighbors[dimIdx] = neighborss[dimIdx][signToSignIdx(pSign(deltaPos2[dimIdx]))];
-            seminormalizedCornerDirection += iVecMult(sign(deltaPos2[dimIdx]), currentPlayerDimensionDirections[dimIdx]);
         }
-
-        bool cornerTraversable = (
-            deltaPos2[0] == 0.0f ||
-            deltaPos2[1] == 0.0f ||
-            currentFace->cornerTraversable(currentFace->seminormalizedDirectionToCornerIndex(seminormalizedCornerDirection))
-        );
 
         float ratiosUntilFaceChange[goptions::numPlaneDimensions]{greaterThanOne};
         float ratiosUntilEdgeHit[goptions::numPlaneDimensions]{greaterThanOne};

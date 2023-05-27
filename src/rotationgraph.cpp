@@ -131,22 +131,11 @@ void RotationGraph::construct(std::vector<Cube*> cubes)
         for (int neighborIdx = 0; neighborIdx < Face::numNeightbors; neighborIdx++) {
             Face* currentFace = face;
             int currentNeighborIdx = neighborIdx;
-            bool shouldPrint = keyFacePair.first.first == glm::ivec3(0,0,0) && keyFacePair.first.second == glm::ivec3(0,0,1) && currentNeighborIdx == 0;
-            shouldPrint = false;
-            if (shouldPrint) {
-                glm::ivec3 cubePos = currentFace->cube()->iPos();
-                glm::ivec3 normal = currentFace->normal();
-            }
             for (int step = 0; step < goptions::numFacesAroundTraversableCorner; step++) {
                 int nextNeighborIdx = (currentFace->neighborBackEdgeIndex(currentNeighborIdx) + (Face::numNeightbors - 1)) % Face::numNeightbors;
                 currentFace = currentFace->neighbor(currentNeighborIdx);
                 currentNeighborIdx = nextNeighborIdx;
-                if (shouldPrint) {
-                    glm::ivec3 cubePos = currentFace->cube()->iPos();
-                    glm::ivec3 normal = currentFace->normal();
-                }
             }
-            if (shouldPrint) {exit(0);}
             // The corner is traversable if we have arrived back at the same face after taking goptions::numFacesAroundTraversableCorner around it
             face->setCornerTraversable(neighborIdx, currentFace == face);
         }
