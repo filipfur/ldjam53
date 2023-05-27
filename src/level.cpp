@@ -67,10 +67,9 @@ const glm::vec3 Cube::cubeOffset{
     goptions::cubeOffsetZ
     };
 
-Face::Face(Cube* cube, size_t normalDim, int normalSign) :
+Face::Face(Cube* cube, AADirection3 normal) :
     _cube(cube),
-    _normalDim(normalDim),
-    _normalSign(normalSign),
+    _normal(normal),
     _neighbors()
 {
 }
@@ -80,9 +79,9 @@ const Cube* Face::cube() const
     return _cube;
 }
 
-glm::ivec3 Face::normal() const
+AADirection3 Face::normal() const
 {
-    return directionDimAndSignToDirection(_normalDim, _normalSign);
+    return _normal;
 }
 
 Face* Face::neighbor(size_t neighborIdx)
@@ -120,19 +119,19 @@ void Face::setCornerTraversable(size_t cornerIdx, bool traversable)
     _cornerTraversable[cornerIdx] = traversable;
 }
 
-const size_t Face::spaceDimensionAndSignToEdgeIndex(size_t spaceDim, int spaceDimSign) const
+const size_t Face::aADirection3ToEdgeIndex(AADirection3 dir) const
 {
     // Calculate index for face edge direction
-    int dimOffset = (spaceDim - 1 - _normalDim + goptions::numDimensions) % goptions::numDimensions;
-    int baseSign = dimOffset == 1 ? _normalSign : 1;  // The sign that will yield the lowest edge index for this dimension
-    return dimOffset + goptions::numPlaneDimensions * (spaceDimSign != baseSign);
+    int dimOffset = (dir.dimension() - 1 - _normal.dimension() + goptions::numDimensions) % goptions::numDimensions;
+    int baseSign = dimOffset == 1 ? _normal.sign() : 1;  // The sign that will yield the lowest edge index for this dimension
+    return dimOffset + goptions::numPlaneDimensions * (dir.sign() != baseSign);
 }
 
 const size_t Face::spaceDirectionToEdgeIndex(glm::ivec3 dir) const
 {
     for (int dirDim = 0; dirDim < goptions::numDimensions; dirDim++) {
         if (dir[dirDim] != 0) {
-            return spaceDimensionAndSignToEdgeIndex(dirDim, dir[dirDim]);
+            return aADirection3ToEdgeIndex(AADirection3(dirDim, dir[dirDim]));
         }
     }
     assert(false);  // Should never reach this line
@@ -141,20 +140,20 @@ const size_t Face::spaceDirectionToEdgeIndex(glm::ivec3 dir) const
 
 const size_t Face::seminormalizedDirectionToCornerIndex(glm::ivec3 dir) const
 {
-    glm::ivec3 doubleEdgeDir = dir - iCross(normal(), dir);
+    glm::ivec3 doubleEdgeDir = dir - cross(normal(), dir);
 
     for (int dirDim = 0; dirDim < goptions::numDimensions; dirDim++) {
         if (doubleEdgeDir[dirDim] != 0) {
-            return spaceDimensionAndSignToEdgeIndex(dirDim, doubleEdgeDir[dirDim] / 2);
+            return aADirection3ToEdgeIndex(AADirection3(dirDim, doubleEdgeDir[dirDim] / 2));
         }
     }
     assert(false);  // Should never reach this line
     return 0;  // Prevent warning "not all control paths return a value"
 }
 
-glm::ivec3 Face::facePosToCubeIPos(glm::vec3 pos, glm::vec3 normal)
+glm::ivec3 Face::facePosToCubeIPos(glm::vec3 pos, AADirection3 normal)
 {
-    return Cube::cubePosToIPos(pos - glm::vec3(normal) * (0.5f * goptions::cubeSideLength));
+    return Cube::cubePosToIPos(pos - (0.5f * goptions::cubeSideLength) * normal);
 }
 
 glm::ivec3 Face::directionDimAndSignToDirection(size_t dirDim, int dirSign)

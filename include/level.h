@@ -13,6 +13,7 @@
 
 // Own includes
 #include "goptions.h"
+#include "aadirection.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,10 +48,10 @@ public:
     static constexpr size_t numCorners = numNeightbors;
 
     Face() = delete;
-    Face(Cube* cube, size_t normalDim, int normalSign);
+    Face(Cube* cube, AADirection3 normal);
 
     const Cube* cube() const;
-    glm::ivec3 normal() const;
+    AADirection3 normal() const;
     Face* neighbor(size_t neighborIdx);
     const Face* neighbor(size_t neighborIdx) const;
     void setNeighbor(size_t neighborIdx, Face* otherFace);
@@ -58,17 +59,16 @@ public:
     void setNeighborBackEdgeIndex(size_t neighborIdx, size_t backEdgeIndex);
     const bool cornerTraversable(size_t cornerIdx) const;
     void setCornerTraversable(size_t cornerIdx, bool traversable);
-    const size_t spaceDimensionAndSignToEdgeIndex(size_t spaceDim, int spaceDimSign) const;
+    const size_t aADirection3ToEdgeIndex(AADirection3 dir) const;
     const size_t spaceDirectionToEdgeIndex(glm::ivec3 dir) const;
     const size_t seminormalizedDirectionToCornerIndex(glm::ivec3 dir) const; // seminormalized means that each component is either 0, 1 or -1
 
-    static glm::ivec3 facePosToCubeIPos(glm::vec3 pos, glm::vec3 normal);
+    static glm::ivec3 facePosToCubeIPos(glm::vec3 pos, AADirection3 normal);
     static glm::ivec3 directionDimAndSignToDirection(size_t dirDim, int dirSign);
 
 private:
     Cube* _cube;
-    size_t _normalDim;
-    int _normalSign;
+    AADirection3 _normal;
     Face* _neighbors[numNeightbors];
     size_t _neighborBackEdgeIndex[numNeightbors];
     bool _cornerTraversable[numCorners];

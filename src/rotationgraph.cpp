@@ -38,12 +38,12 @@ void RotationGraph::construct(std::vector<Cube*> cubes)
 
         for (int normalDim = 0; normalDim < goptions::numDimensions; normalDim++) {
             for (auto& normalSign : {-1, 1}) {
-                glm::ivec3 faceNormal = Face::directionDimAndSignToDirection(normalDim, normalSign);
+                AADirection3 faceNormal(normalDim, normalSign);
 
                 // Check if face is directly facing another cube
                 if (_cubes.find(cubeIpos + faceNormal) == _cubes.end()) {
                     // Cube face is not facing any other cube => face exists
-                    _faces[FaceMapKey(cubeIpos, faceNormal)] = new Face(cube, normalDim, normalSign);
+                    _faces[FaceMapKey(cubeIpos, faceNormal)] = new Face(cube, faceNormal);
                 }
             }
         }
@@ -55,7 +55,7 @@ void RotationGraph::construct(std::vector<Cube*> cubes)
 
         for (int normalDim = 0; normalDim < goptions::numDimensions; normalDim++) {
             for (auto& normalSign : {-1, 1}) {
-                glm::ivec3 faceNormal = Face::directionDimAndSignToDirection(normalDim, normalSign);
+                AADirection3 faceNormal = AADirection3(normalDim, normalSign);
 
                 // Extract the face
                 auto faceIt = _faces.find(FaceMapKey(cubeIpos, faceNormal));
@@ -77,17 +77,18 @@ void RotationGraph::construct(std::vector<Cube*> cubes)
                 for (int orthDimIdx = 0; orthDimIdx < goptions::numDimensions-1; orthDimIdx++) {
                     int orthDim = orthDimIdx + (orthDimIdx >= normalDim);
                     for (auto& orthDimDirSign : {-1, 1}) {
+                        AADirection3 orthOffsetDir(orthDim, orthDimDirSign);
                         glm::ivec3 orthOffset(0);
                         orthOffset[orthDim] = orthDimDirSign;
 
                         // Calculate index of face edge
-                        int faceEdgeIdx = face->spaceDimensionAndSignToEdgeIndex(orthDim, orthDimDirSign);
+                        int faceEdgeIdx = face->aADirection3ToEdgeIndex(AADirection3(orthDim, orthDimDirSign));
 
                         glm::ivec3 otherCubeIpos;
                         // Look for face on cube diagonally to this cube
                         if (_cubes.find(otherCubeIpos = cubeIpos + orthOffset + faceNormal) != _cubes.end()) {
                             // Face is adjacent to face on other cube with 90 degree andle to itself in the given orthogonal direction
-                            auto otherFace = _faces.find(FaceMapKey(otherCubeIpos, -orthOffset));
+                            auto otherFace = _faces.find(FaceMapKey(otherCubeIpos, -orthOffsetDir));
                             if (otherFace != _faces.end()) {
                                 face->setNeighbor(faceEdgeIdx, otherFace->second);
                             }
@@ -102,7 +103,7 @@ void RotationGraph::construct(std::vector<Cube*> cubes)
                         }
                         else {
                             // Face is simply adjacent to face on the same cube in the given orthogonal direction
-                            auto otherFace = _faces.find(FaceMapKey(cubeIpos, orthOffset));
+                            auto otherFace = _faces.find(FaceMapKey(cubeIpos, orthOffsetDir));
                             if (otherFace != _faces.end()) {
                                 face->setNeighbor(faceEdgeIdx, otherFace->second);
                             }

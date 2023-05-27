@@ -112,7 +112,7 @@ void PlayerControl::move(float dt)
     Face* currentFace = _currentFace;  // If the player moves between faces, iterate through the faces and keep track of which face he is on
     glm::vec3 currentMidPos(playerPosToMidPos(_sprite->position(), _playerDimensionDirections[VERTICAL]));  // Keep track of the player's mid position
     glm::vec3 currentVelocity(_velocity);  // Keep track of the player's velocity
-    glm::vec3 currentPlayerDimensionDirections[goptions::numDimensions]{  // Keep track of the player's coordinate system axis directions
+    AADirection3 currentPlayerDimensionDirections[goptions::numDimensions]{  // Keep track of the player's coordinate system axis directions
         _playerDimensionDirections[0],  // Right
         _playerDimensionDirections[1],  // Up
         _playerDimensionDirections[2]}; // Normal
@@ -138,10 +138,10 @@ void PlayerControl::move(float dt)
         bool edgeAndCornerTraversable[goptions::numPlaneDimensions];
 
         for (int dimIdx = 0; dimIdx < goptions::numPlaneDimensions; dimIdx++) {
-            deltaPos2[dimIdx] = glm::dot(deltaPosition, currentPlayerDimensionDirections[dimIdx]);
+            deltaPos2[dimIdx] = dot(deltaPosition, currentPlayerDimensionDirections[dimIdx]);
             absDeltaPos2[dimIdx] = std::abs(deltaPos2[dimIdx]);
             for (int signIdx = 0; signIdx < 2; signIdx++) {
-                neighborss[dimIdx][signIdx] = currentFace->neighbor(currentFace->spaceDirectionToEdgeIndex(iVecMult(signIdxToSign(signIdx), currentPlayerDimensionDirections[dimIdx])));
+                neighborss[dimIdx][signIdx] = currentFace->neighbor(currentFace->aADirection3ToEdgeIndex(currentPlayerDimensionDirections[dimIdx].signMul(signIdxToSign(signIdx))));
                 edgeTraversable[dimIdx][signIdx] = (
                     neighborss[dimIdx][signIdx]->normal() == currentFace->normal() ||  // The player can always traverse to neighboring faces with the same normal
                     dimIdx == HORIZONTAL ||  // Player should be able to traverse over horizontal edges
@@ -159,7 +159,7 @@ void PlayerControl::move(float dt)
         for (int dimIdx = 0; dimIdx < goptions::numPlaneDimensions; dimIdx++) {
             if (deltaPos2[dimIdx] != 0.0f) {
                 // Face change
-                float distanceUntilFaceChange = 0.5f * goptions::cubeSideLength - sign(deltaPos2[dimIdx]) * glm::dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[dimIdx]);
+                float distanceUntilFaceChange = 0.5f * goptions::cubeSideLength - sign(deltaPos2[dimIdx]) * dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[dimIdx]);
                 ratiosUntilFaceChange[dimIdx] = distanceUntilFaceChange / absDeltaPos2[dimIdx];
 
                 // Edge hit
@@ -171,9 +171,9 @@ void PlayerControl::move(float dt)
             if (deltaPos2[dimIdx] != 0.0f) {
                 // Calculate whether the payer will be able to traverse the edge, with corners taken into account
                 int otherDimIdx = 1 - dimIdx; assert(goptions::numPlaneDimensions == 2);
-                float edgeHitPosition = glm::dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[otherDimIdx]) + std::max(ratiosUntilEdgeHit[dimIdx], 0.0f) * deltaPos2[otherDimIdx];
-                glm::ivec3 firstSeminormalizedCornerDirection  = fSign(deltaPos2[dimIdx]) * currentPlayerDimensionDirections[dimIdx] - currentPlayerDimensionDirections[otherDimIdx];
-                glm::ivec3 secondSeminormalizedCornerDirection = fSign(deltaPos2[dimIdx]) * currentPlayerDimensionDirections[dimIdx] + currentPlayerDimensionDirections[otherDimIdx];
+                float edgeHitPosition = dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[otherDimIdx]) + std::max(ratiosUntilEdgeHit[dimIdx], 0.0f) * deltaPos2[otherDimIdx];
+                glm::ivec3 firstSeminormalizedCornerDirection  = sign(deltaPos2[dimIdx]) * currentPlayerDimensionDirections[dimIdx] - currentPlayerDimensionDirections[otherDimIdx];
+                glm::ivec3 secondSeminormalizedCornerDirection = sign(deltaPos2[dimIdx]) * currentPlayerDimensionDirections[dimIdx] + currentPlayerDimensionDirections[otherDimIdx];
                 int firstCornerIndex = currentFace->seminormalizedDirectionToCornerIndex(firstSeminormalizedCornerDirection);
                 int secondCornerIndex = currentFace->seminormalizedDirectionToCornerIndex(secondSeminormalizedCornerDirection);
                 bool firstCornerTraversable  = currentFace->cornerTraversable(firstCornerIndex);
@@ -194,7 +194,7 @@ void PlayerControl::move(float dt)
                 ratiosUntilEdgeHit[dimIdx] = greaterThanOne;
                 edgeAndCornerTraversable[dimIdx] = true;
             }
-            intersectingEdge[dimIdx] = 0.5f * goptions::cubeSideLength - (std::abs(glm::dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[dimIdx])) + 0.5f * _playerSizes[dimIdx]) < 0;
+            intersectingEdge[dimIdx] = 0.5f * goptions::cubeSideLength - (std::abs(dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[dimIdx])) + 0.5f * _playerSizes[dimIdx]) < 0;
         }
         if (invalidValues) {
             std::cout << "ERROR: Invalid ratio detected (1)!" << std::endl;
@@ -228,8 +228,7 @@ void PlayerControl::move(float dt)
             }
 
             // Stop velocity in the direction of the edge. Model the edge as frictionless and only remove the component of the velocity that is orthogonal to it
-            size_t directionDimIdx = direction3ToDimensionIndex(currentPlayerDimensionDirections[minRatioUntilUntraversableEdgeHitPlaneDimIdx]);
-            currentVelocity[directionDimIdx] = 0.0f;
+            currentVelocity[currentPlayerDimensionDirections[minRatioUntilUntraversableEdgeHitPlaneDimIdx].dimension()] = 0.0f;
 
             if(minRatioUntilUntraversableEdgeHitPlaneDimIdx == VERTICAL && deltaPos2[VERTICAL] < 0.0f)
             {
@@ -247,17 +246,17 @@ void PlayerControl::move(float dt)
                 exit(0);
             }
 
-            glm::ivec3 oldNormal = currentFace->normal();
+            AADirection3 oldNormal = currentFace->normal();
             // Update current face
             currentFace = neighbors[minRatioUntilFaceChangePlaneDimIdx];
-            glm::ivec3 newNormal = currentFace->normal();
+            AADirection3 newNormal = currentFace->normal();
 
             if (newNormal != oldNormal) {
                 // Rotate velocity
                 currentVelocity = rotatedVecor(currentVelocity, oldNormal, newNormal);
                 // Rotate player dimension directions
                 for (int dimIdx = 0; dimIdx < goptions::numDimensions; dimIdx++) {
-                    currentPlayerDimensionDirections[dimIdx] = rotatedVecor(currentPlayerDimensionDirections[dimIdx], oldNormal, newNormal);
+                    currentPlayerDimensionDirections[dimIdx] = rotatedAADirection3(currentPlayerDimensionDirections[dimIdx], oldNormal, newNormal);
                 }
             }
         }
@@ -274,8 +273,8 @@ void PlayerControl::move(float dt)
     }
 
     glm::vec3 newPosition = playerMidPosToPos(currentMidPos, currentPlayerDimensionDirections[VERTICAL]);
-    size_t normalDirectionDimIdx = direction3ToDimensionIndex(currentPlayerDimensionDirections[NORMAL]);
-    int normalDirectionSign = currentPlayerDimensionDirections[NORMAL][normalDirectionDimIdx];
+    size_t normalDirectionDimIdx = currentPlayerDimensionDirections[NORMAL].dimension();
+    int normalDirectionSign = currentPlayerDimensionDirections[NORMAL].sign();
     // Move newPosition to a face if it's not already at a face
     newPosition[normalDirectionDimIdx] = currentFace->facePosToCubeIPos(newPosition, currentPlayerDimensionDirections[NORMAL])[normalDirectionDimIdx] * goptions::cubeSideLength + Cube::cubeOffset[normalDirectionDimIdx] + 0.5f * goptions::cubeSideLength * normalDirectionSign;
 
@@ -300,7 +299,8 @@ void PlayerControl::setFaceMap(FaceMap* faces, glm::vec3 playerPos)
 
 void PlayerControl::increaseSpeedComponent(size_t dim, float increase)
 {
-    _velocity += increase * _playerDimensionDirections[dim];
+    AADirection3 compDir = _playerDimensionDirections[dim];
+    _velocity[compDir.dimension()] += increase * compDir.sign();
 }
 
 void PlayerControl::increaseSpeedRight(float increase)
@@ -315,7 +315,7 @@ void PlayerControl::increaseSpeedUp(float increase)
 
 float PlayerControl::speedComponent(size_t dim) const
 {
-    return glm::dot(_velocity, _playerDimensionDirections[dim]);
+    return dot(_velocity, _playerDimensionDirections[dim]);
 }
 
 float PlayerControl::speedRight() const
@@ -330,7 +330,8 @@ float PlayerControl::speedUp() const
 
 void PlayerControl::setSpeedComponent(size_t dim, float speed)
 {
-    _velocity += (speed - speedComponent(dim)) * _playerDimensionDirections[dim];
+    AADirection3 compDir = _playerDimensionDirections[dim];
+    _velocity[compDir.dimension()] = speed * compDir.sign();
 }
 
 void PlayerControl::setSpeedRight(float speed)
@@ -343,17 +344,17 @@ void PlayerControl::setSpeedUp(float speed)
     setSpeedComponent(VERTICAL, speed);
 }
 
-glm::vec3 PlayerControl::playerPosToMidPos(glm::vec3 playerPos, glm::vec3 playerUpDirection)
+glm::vec3 PlayerControl::playerPosToMidPos(glm::vec3 playerPos, AADirection3 playerUpDirection)
 {
     return playerPos + 0.5f * goptions::characterHeight * playerUpDirection;
 }
 
-glm::vec3 PlayerControl::playerMidPosToPos(glm::vec3 playerMidPos, glm::vec3 playerUpDirection)
+glm::vec3 PlayerControl::playerMidPosToPos(glm::vec3 playerMidPos, AADirection3 playerUpDirection)
 {
     return playerMidPos - 0.5f * goptions::characterHeight * playerUpDirection;
 }
 
-glm::ivec3 PlayerControl::playerFaceCubeIPos(glm::vec3 playerPos, glm::vec3 playerUpDirection, glm::vec3 playerNormal)
+glm::ivec3 PlayerControl::playerFaceCubeIPos(glm::vec3 playerPos, AADirection3 playerUpDirection, AADirection3 playerNormal)
 {
     return Face::facePosToCubeIPos(playerPosToMidPos(playerPos, playerUpDirection), playerNormal);
 }

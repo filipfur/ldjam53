@@ -30,7 +30,7 @@ class RotationGraphEdge;
 
 
 using CubeMapKey = glm::ivec3;
-using FaceMapKey = std::pair<const glm::ivec3, const glm::ivec3>;
+using FaceMapKey = std::pair<const glm::ivec3, const AADirection3>;
 
 
 struct cubeLess {
@@ -51,9 +51,8 @@ struct faceLess {
             lhs.first.x != rhs.first.x ? lhs.first.x < rhs.first.x :
             lhs.first.y != rhs.first.y ? lhs.first.y < rhs.first.y :
             lhs.first.z != rhs.first.z ? lhs.first.z < rhs.first.z :
-            lhs.second.x != rhs.second.x ? lhs.second.x < rhs.second.x :
-            lhs.second.y != rhs.second.y ? lhs.second.y < rhs.second.y :
-            lhs.second.z != rhs.second.z ? lhs.second.z < rhs.second.z :
+            lhs.second.dimension() != rhs.second.dimension() ? lhs.second.dimension() < rhs.second.dimension() :
+            lhs.second.sign() != rhs.second.sign() ? lhs.second.sign() < rhs.second.sign() :
             false
             );
     }

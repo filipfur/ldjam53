@@ -32,15 +32,15 @@ int main(int argc, const char* argv[])
     for (auto faceIt = rg.faces().begin(); faceIt != rg.faces().end(); faceIt++)
     {
         glm::ivec3 cubeIpos = faceIt->first.first;
-        glm::ivec3 faceNormal = faceIt->first.second;
+        AADirection3 faceNormal = faceIt->first.second;
         Face* face = faceIt->second;
-        std::cout << "Face at " << glm::to_string(cubeIpos) << " -> " << glm::to_string(faceNormal) << ": " << face << std::endl;
+        std::cout << "Face at " << glm::to_string(cubeIpos) << " -> " << glm::to_string(faceNormal.toIVec3()) << ": " << face << std::endl;
         for (int nIdx = 0; nIdx < Face::numNeightbors; nIdx++) {
             const Face* neighbor = face->neighbor(nIdx);
             //std::cout << "* neighbor: " << neighbor << std::endl;
             glm::ivec3 neighborCubeIpos = neighbor->cube()->iPos();
-            glm::ivec3 neighborNormal = neighbor->normal();
-            std::cout << "* Neighbor " << nIdx << ": at " << glm::to_string(neighborCubeIpos) << " -> " << glm::to_string(neighborNormal) << ": " << neighbor << std::endl;
+            AADirection3 neighborNormal = neighbor->normal();
+            std::cout << "* Neighbor " << nIdx << ": at " << glm::to_string(neighborCubeIpos) << " -> " << glm::to_string(neighborNormal.toIVec3()) << ": " << neighbor << std::endl;
         }
         for (int nIdx = 0; nIdx < Face::numNeightbors; nIdx++) {
             std::cout << "* Backlink " << nIdx << ": " << face->neighborBackEdgeIndex(nIdx) << std::endl;

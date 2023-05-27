@@ -5,6 +5,8 @@
 #include "glinput.h"
 #include "rotationgraph.h"
 
+#include "aadirection.h"
+
 class PlayerControl : public lithium::Updateable
 {
 public:
@@ -55,18 +57,18 @@ public:
         return _sprite->position();
     }
 
-    static glm::vec3 playerPosToMidPos(glm::vec3 playerPos, glm::vec3 playerUpDirection);
-    static glm::vec3 playerMidPosToPos(glm::vec3 playerMidPos, glm::vec3 playerUpDirection);
-    static glm::ivec3 playerFaceCubeIPos(glm::vec3 playerPos, glm::vec3 playerUpDirection, glm::vec3 playerNormal);
+    static glm::vec3 playerPosToMidPos(glm::vec3 playerPos, AADirection3 playerUpDirection);
+    static glm::vec3 playerMidPosToPos(glm::vec3 playerMidPos, AADirection3 playerUpDirection);
+    static glm::ivec3 playerFaceCubeIPos(glm::vec3 playerPos, AADirection3 playerUpDirection, AADirection3 playerNormal);
 
 private:
     std::shared_ptr<Sprite> _sprite;
     std::shared_ptr<lithium::Input::KeyCache> _keyCache;
     Face* _currentFace{nullptr};
-    glm::vec3 _playerDimensionDirections[goptions::numDimensions]{
-        glm::ivec3{1, 0, 0},  // Right
-        glm::ivec3{0, 1, 0},  // Up
-        glm::ivec3{0, 0, 1}}; // Normal
+    AADirection3 _playerDimensionDirections[goptions::numDimensions]{
+        AADirection3(0, 1),  // Right
+        AADirection3(1, 1),  // Up
+        AADirection3(2, 1)}; // Normal
     glm::vec3 _velocity{0.0f};
     FaceMap* _faces{};
     float _jumpDuration{0.0f};

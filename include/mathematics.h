@@ -53,18 +53,20 @@ inline glm::ivec3 iVecMult(int factor, glm::ivec3 vec)
         factor * vec[2]);
 }
 
-inline glm::vec3 rotatedVecor(glm::vec3 vec, glm::vec3 rotateFromVec, glm::vec3 rotateToVec)
+inline glm::vec3 rotatedVecor(glm::vec3 vec, AADirection3 rotateFromVec, AADirection3 rotateToVec)
 {
-    float rotateFromComponent = glm::dot(vec, rotateFromVec);
-    float rotateToComponent = glm::dot(vec, rotateToVec);
-    return vec + (-rotateFromComponent - rotateToComponent) * rotateFromVec + (rotateFromComponent - rotateToComponent) * rotateToVec;
+    float oldRotateFromComponent = dot(vec, rotateFromVec);
+    float oldRotateToComponent = dot(vec, rotateToVec);
+    return vec + (-oldRotateFromComponent - oldRotateToComponent) * rotateFromVec + (oldRotateFromComponent - oldRotateToComponent) * rotateToVec;
 }
 
-template <typename T>
-size_t direction3ToDimensionIndex(T vec)
+inline AADirection3 rotatedAADirection3(AADirection3 vec, AADirection3 rotateFromVec, AADirection3 rotateToVec)
 {
+    int newRotateFromComponent = -dot(vec, rotateToVec);
+    int newRotateToComponent = dot(vec, rotateFromVec);
     return (
-        0 * (vec[0] != 0) +
-        1 * (vec[1] != 0) +
-        2 * (vec[2] != 0) );
+        newRotateFromComponent ? AADirection3(rotateFromVec.dimension(), newRotateFromComponent * rotateFromVec.sign()) :
+        newRotateToComponent   ? AADirection3(rotateToVec  .dimension(), newRotateToComponent   * rotateToVec  .sign()) :
+        vec
+        );
 }
