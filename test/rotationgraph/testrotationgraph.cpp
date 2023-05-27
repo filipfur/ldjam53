@@ -2,6 +2,9 @@
 
 #include <glm/glm.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL  // glm::to_string
+#include "glm/ext.hpp"  // glm::to_string
+
 #include "rotationgraph.h"
 //#include "playercontrol.h"
 
@@ -22,7 +25,7 @@ int main(int argc, const char* argv[])
     {
         glm::ivec3 cubeIpos = cubeIt->first;
         Cube* cube = cubeIt->second;
-        std::cout << "Cube at (" << cubeIpos.x << ", " << cubeIpos.y << ", " << cubeIpos.z << "): " << cube << std::endl;
+        std::cout << "Cube at " << glm::to_string(cubeIpos) << ": " << cube << std::endl;
     }
 
     // using FaceMapKey = std::pair<const glm::ivec3, const glm::ivec3>;
@@ -31,13 +34,13 @@ int main(int argc, const char* argv[])
         glm::ivec3 cubeIpos = faceIt->first.first;
         glm::ivec3 faceNormal = faceIt->first.second;
         Face* face = faceIt->second;
-        std::cout << "Face at (" << cubeIpos.x << ", " << cubeIpos.y << ", " << cubeIpos.z << ") -> (" << faceNormal.x << ", " << faceNormal.y << ", " << faceNormal.z << "): " << face << std::endl;
+        std::cout << "Face at " << glm::to_string(cubeIpos) << " -> " << glm::to_string(faceNormal) << ": " << face << std::endl;
         for (int nIdx = 0; nIdx < Face::numNeightbors; nIdx++) {
             const Face* neighbor = face->neighbor(nIdx);
             //std::cout << "* neighbor: " << neighbor << std::endl;
             glm::ivec3 neighborCubeIpos = neighbor->cube()->iPos();
             glm::ivec3 neighborNormal = neighbor->normal();
-            std::cout << "* Neighbor " << nIdx << ": at (" << neighborCubeIpos.x << ", " << neighborCubeIpos.y << ", " << neighborCubeIpos.z << ") -> (" << neighborNormal.x << ", " << neighborNormal.y << ", " << neighborNormal.z << "): " << neighbor << std::endl;
+            std::cout << "* Neighbor " << nIdx << ": at " << glm::to_string(neighborCubeIpos) << " -> " << glm::to_string(neighborNormal) << ": " << neighbor << std::endl;
         }
         for (int nIdx = 0; nIdx < Face::numNeightbors; nIdx++) {
             std::cout << "* Backlink " << nIdx << ": " << face->neighborBackEdgeIndex(nIdx) << std::endl;

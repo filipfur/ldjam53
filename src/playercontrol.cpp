@@ -231,7 +231,7 @@ void PlayerControl::move(float dt)
             deltaPositionRatio = ratiosUntilEdgeHit[minRatioUntilUntraversableEdgeHitPlaneDimIdx];
 
             if (deltaPositionRatio < 0.0f) {
-                std::cout << "Negative deltaPositionRatio detected (1): " << deltaPositionRatio << std::endl;
+                std::cout << "ERROR: Negative deltaPositionRatio detected (1): " << deltaPositionRatio << std::endl;
                 exit(0);
             }
 
@@ -251,7 +251,7 @@ void PlayerControl::move(float dt)
             deltaPositionRatio = ratiosUntilFaceChange[minRatioUntilFaceChangePlaneDimIdx];
 
             if (deltaPositionRatio < 0.0f) {
-                std::cout << "Negative deltaPositionRatio detected (2): " << deltaPositionRatio << std::endl;
+                std::cout << "ERROR: Negative deltaPositionRatio detected (2): " << deltaPositionRatio << std::endl;
                 exit(0);
             }
 
