@@ -11,9 +11,6 @@
 // Third party includes
 #include "glm/glm.hpp"
 
-#define GLM_ENABLE_EXPERIMENTAL  // glm::to_string
-#include "glm/ext.hpp"  // glm::to_string
-
 // Own includes
 #include "goptions.h"
 #include "rotationgraph.h"
@@ -26,18 +23,6 @@
 
 void RotationGraph::construct(std::vector<Cube*> cubes)
 {
-    if (1) {
-        for (auto& cube : cubes) {
-            //std::cout << "Cube at i-position " << glm::to_string(cube->iPos()) << "; position " << glm::to_string(cube->pos()) << std::endl;
-            std::cout << "Cube at i-position " << glm::to_string(cube->iPos()) << std::endl;
-            if (glm::length(Cube::cubeIPosToPos(cube->iPos()) - cube->pos()) > 0.001f) {
-                //std::cout << "ERROR: Cube at i-position " << glm::to_string(cube->iPos()) << "; position " << glm::to_string(cube->pos()) << std::endl;
-                //exit(0);
-            }
-        }
-        std::cout << "All cube i-postions printed." << std::endl;
-        //exit(0);
-    }
     _cubes.clear();
     _faces.clear();
 
@@ -151,7 +136,6 @@ void RotationGraph::construct(std::vector<Cube*> cubes)
             if (shouldPrint) {
                 glm::ivec3 cubePos = currentFace->cube()->iPos();
                 glm::ivec3 normal = currentFace->normal();
-                std::cout << "0: cubePos = (" << cubePos.x << ", " << cubePos.y << ", " << cubePos.z << "), normal = (" << normal.x << ", " << normal.y << ", " << normal.z << "), currentNeighborIdx = " << currentNeighborIdx << std::endl;
             }
             for (int step = 0; step < goptions::numFacesAroundTraversableCorner; step++) {
                 int nextNeighborIdx = (currentFace->neighborBackEdgeIndex(currentNeighborIdx) + (Face::numNeightbors - 1)) % Face::numNeightbors;
@@ -160,7 +144,6 @@ void RotationGraph::construct(std::vector<Cube*> cubes)
                 if (shouldPrint) {
                     glm::ivec3 cubePos = currentFace->cube()->iPos();
                     glm::ivec3 normal = currentFace->normal();
-                    std::cout << "0: cubePos = (" << cubePos.x << ", " << cubePos.y << ", " << cubePos.z << "), normal = (" << normal.x << ", " << normal.y << ", " << normal.z << "), currentNeighborIdx = " << currentNeighborIdx << std::endl;
                 }
             }
             if (shouldPrint) {exit(0);}

@@ -3,9 +3,6 @@
 #include "goptions.h"
 #include "mathematics.h"
 
-#define GLM_ENABLE_EXPERIMENTAL  // glm::to_string
-#include "glm/ext.hpp"  // glm::to_string
-
 PlayerControl::PlayerControl(std::shared_ptr<Sprite> sprite, std::shared_ptr<lithium::Input> input) :
     _sprite(sprite)
 {
@@ -128,7 +125,7 @@ void PlayerControl::move(float dt)
         }
 
         glm::vec3 deltaPosition = currentVelocity * dt;
-    
+
         const Cube* currentCube = currentFace->cube();
         glm::ivec3 currentCubeIPos = currentCube->iPos();
         glm::vec3 currentCubePos = currentCube->pos();
@@ -166,22 +163,6 @@ void PlayerControl::move(float dt)
         float ratiosUntilEdgeHit[goptions::numPlaneDimensions]{greaterThanOne};
         bool intersectingEdge[goptions::numPlaneDimensions]{false};
 
-        if (1) {
-            std::cout << "=======================================================================" << std::endl;
-            std::cout << "loopNumber: " << loopNumber << std::endl;
-            std::cout << "dt: " << dt << std::endl;
-            std::cout << "currentCubeIPos: " << glm::to_string(currentCubeIPos) << std::endl;
-            std::cout << "currentCubePos: " << glm::to_string(currentCubePos) << std::endl;
-            std::cout << "currentMidPos: " << glm::to_string(currentMidPos) << std::endl;
-            std::cout << "currentVelocity: " << glm::to_string(currentVelocity) << std::endl;
-            std::cout << "deltaPosition: " << glm::to_string(deltaPosition) << std::endl;
-            std::cout << "deltaPos2: " << glm::to_string(deltaPos2) << std::endl;
-            std::cout << "sign(deltaPos2): " << glm::to_string(glm::vec2(sign(deltaPos2[0]), sign(deltaPos2[1]))) << std::endl;
-            std::cout << "currentCubeIPos: " << glm::to_string(currentCubeIPos) << std::endl;
-            std::cout << "currentPlayerDimensionDirections[HORIZONTAL]: " << glm::to_string(currentPlayerDimensionDirections[HORIZONTAL]) << std::endl;
-            std::cout << "currentPlayerDimensionDirections[VERTICAL]: " << glm::to_string(currentPlayerDimensionDirections[VERTICAL]) << std::endl;
-            std::cout << "currentPlayerDimensionDirections[NORMAL]: " << glm::to_string(currentPlayerDimensionDirections[NORMAL]) << std::endl;
-        }
         bool invalidValues = false;
         for (int dimIdx = 0; dimIdx < goptions::numPlaneDimensions; dimIdx++) {
             if (deltaPos2[dimIdx] != 0.0f) {
@@ -199,53 +180,21 @@ void PlayerControl::move(float dt)
                 // Calculate whether the payer will be able to traverse the edge, with corners taken into account
                 int otherDimIdx = 1 - dimIdx; assert(goptions::numPlaneDimensions == 2);
                 float edgeHitPosition = glm::dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[otherDimIdx]) + std::max(ratiosUntilEdgeHit[dimIdx], 0.0f) * deltaPos2[otherDimIdx];
-                glm::ivec3 firstSeminormalizedCornerDirection  = sign(deltaPos2[dimIdx]) * currentPlayerDimensionDirections[dimIdx] - currentPlayerDimensionDirections[otherDimIdx];
-                glm::ivec3 secondSeminormalizedCornerDirection = sign(deltaPos2[dimIdx]) * currentPlayerDimensionDirections[dimIdx] + currentPlayerDimensionDirections[otherDimIdx];
+                glm::ivec3 firstSeminormalizedCornerDirection  = fSign(deltaPos2[dimIdx]) * currentPlayerDimensionDirections[dimIdx] - currentPlayerDimensionDirections[otherDimIdx];
+                glm::ivec3 secondSeminormalizedCornerDirection = fSign(deltaPos2[dimIdx]) * currentPlayerDimensionDirections[dimIdx] + currentPlayerDimensionDirections[otherDimIdx];
                 int firstCornerIndex = currentFace->seminormalizedDirectionToCornerIndex(firstSeminormalizedCornerDirection);
                 int secondCornerIndex = currentFace->seminormalizedDirectionToCornerIndex(secondSeminormalizedCornerDirection);
                 bool firstCornerTraversable  = currentFace->cornerTraversable(firstCornerIndex);
                 bool secondCornerTraversable = currentFace->cornerTraversable(secondCornerIndex);
 
                 float characterThinningFactor = 1.0f - ((deltaPos2[otherDimIdx] == 0.0f || ratiosUntilEdgeHit[dimIdx] < 0.0f) ? 1e-3f : 0.0f); // Prevent character from hitting corners he should just scrape against but not bump into, which can happen if he is travelling parallel with one axis
-                std::cout << "## deltaPos2["<< otherDimIdx << "]: " << deltaPos2[otherDimIdx] << std::endl;
-                std::cout << "## characterThinningFactor: " << characterThinningFactor << std::endl;
                 edgeAndCornerTraversable[dimIdx] = (
                     edgeTraversable[dimIdx][signToSignIdx(pSign(deltaPos2[dimIdx]))]
                     && (edgeHitPosition > -0.5f * (goptions::cubeSideLength - characterThinningFactor * _playerSizes[otherDimIdx]) || firstCornerTraversable  || !edgeTraversable[otherDimIdx][0])
                     && (edgeHitPosition <  0.5f * (goptions::cubeSideLength - characterThinningFactor * _playerSizes[otherDimIdx]) || secondCornerTraversable || !edgeTraversable[otherDimIdx][1])
                 );
-                if (0 && dimIdx == HORIZONTAL && !edgeAndCornerTraversable[dimIdx] && ratiosUntilEdgeHit[dimIdx] < 1.0f) {
-                    std::cout << "#################################" << std::endl;
-                    std::cout << "dimIdx: " << dimIdx << std::endl;
-                    std::cout << "currentMidPos: " << glm::to_string(currentMidPos) << std::endl;
-                    std::cout << "currentCubePos: " << glm::to_string(currentCubePos) << std::endl;
-                    std::cout << "currentCubeIPos: " << glm::to_string(currentCubeIPos) << std::endl;
-                    glm::ivec3 cdirs[4] = {glm::ivec3(1, -1, 0), glm::ivec3(1, 1, 0), glm::ivec3(-1, 1, 0), glm::ivec3(-1, -1, 0)};
-                    for (int i=0; i < 4; i++) {
-                        std::cout << "corner " << glm::to_string(cdirs[i]) << " traversable: " << currentFace->cornerTraversable(currentFace->seminormalizedDirectionToCornerIndex(cdirs[i])) << std::endl;
-                    }
-                    std::cout << "firstCornerIndex: " << firstCornerIndex << std::endl;
-                    std::cout << "secondCornerIndex: " << secondCornerIndex << std::endl;
-                    std::cout << "firstCornerTraversable: " << firstCornerTraversable << std::endl;
-                    std::cout << "secondCornerTraversable: " << secondCornerTraversable << std::endl;
-                    std::cout << "deltaPos2: " << glm::to_string(deltaPos2) << std::endl;
-                    std::cout << "firstSeminormalizedCornerDirection : " << glm::to_string(firstSeminormalizedCornerDirection) << std::endl;
-                    std::cout << "secondSeminormalizedCornerDirection: " << glm::to_string(secondSeminormalizedCornerDirection) << std::endl;
-                    std::cout << "edgeHitPosition: " << edgeHitPosition << std::endl;
-                    std::cout << "(edgeHitPosition > -0.5f * (goptions::cubeSideLength - _playerSizes[otherDimIdx]) || firstCornerTraversable ): " << (edgeHitPosition > -0.5f * (goptions::cubeSideLength - _playerSizes[otherDimIdx]) || firstCornerTraversable ) << std::endl;
-                    std::cout << "(edgeHitPosition <  0.5f * (goptions::cubeSideLength - _playerSizes[otherDimIdx]) || secondCornerTraversable): " << (edgeHitPosition <  0.5f * (goptions::cubeSideLength - _playerSizes[otherDimIdx]) || secondCornerTraversable) << std::endl;
-                    exit(0);
-                }
                 if (ratiosUntilFaceChange[dimIdx] < 0.0f || ratiosUntilEdgeHit[dimIdx] < 0.0f && !edgeAndCornerTraversable[dimIdx]) {
                     invalidValues = true;
-                }
-                if (1) {
-                    std::cout << "--------" << std::endl;
-                    std::cout << "ratiosUntilFaceChange[" << dimIdx << "]: " << ratiosUntilFaceChange[dimIdx] << std::endl;
-                    std::cout << "ratiosUntilEdgeHit[" << dimIdx << "]: " << ratiosUntilEdgeHit[dimIdx] << std::endl;
-                    std::cout << "characterThinningFactor: " << characterThinningFactor << std::endl;
-                    std::cout << "edgeAndCornerTraversable[" << dimIdx << "]: " << edgeAndCornerTraversable[dimIdx] << std::endl;
-                    std::cout << "ratiosUntilEdgeHit[" << dimIdx << "]: " << ratiosUntilEdgeHit[dimIdx] << std::endl;
                 }
             }
             else {
@@ -254,10 +203,6 @@ void PlayerControl::move(float dt)
                 edgeAndCornerTraversable[dimIdx] = true;
             }
             intersectingEdge[dimIdx] = 0.5f * goptions::cubeSideLength - (std::abs(glm::dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[dimIdx])) + 0.5f * _playerSizes[dimIdx]) < 0;
-        }
-        if (1) {
-            std::cout << "--------" << std::endl;
-            std::cout << "_playerSizes: " << glm::to_string(glm::vec2(_playerSizes[0], _playerSizes[1])) << std::endl;
         }
         if (invalidValues) {
             std::cout << "ERROR: Invalid ratio detected (1)!" << std::endl;
@@ -278,8 +223,6 @@ void PlayerControl::move(float dt)
                 minRatioUntilFaceChangePlaneDimIdx = dimIdx;
             }
         }
-        std::cout << "minRatioUntilFaceChangePlaneDimIdx: " << minRatioUntilFaceChangePlaneDimIdx << std::endl;
-        std::cout << "minRatioUntilUntraversableEdgeHitPlaneDimIdx: " << minRatioUntilUntraversableEdgeHitPlaneDimIdx << std::endl;
 
         // Calculate what percentage of deltaPosition should be used during this iteration
         float deltaPositionRatio = 1.0f;
@@ -288,7 +231,7 @@ void PlayerControl::move(float dt)
             deltaPositionRatio = ratiosUntilEdgeHit[minRatioUntilUntraversableEdgeHitPlaneDimIdx];
 
             if (deltaPositionRatio < 0.0f) {
-                std::cout << "Negative deltaPositionRatio 1: " << deltaPositionRatio << std::endl;
+                std::cout << "Negative deltaPositionRatio detected (1): " << deltaPositionRatio << std::endl;
                 exit(0);
             }
 
@@ -308,7 +251,7 @@ void PlayerControl::move(float dt)
             deltaPositionRatio = ratiosUntilFaceChange[minRatioUntilFaceChangePlaneDimIdx];
 
             if (deltaPositionRatio < 0.0f) {
-                std::cout << "Negative deltaPositionRatio 2: " << deltaPositionRatio << std::endl;
+                std::cout << "Negative deltaPositionRatio detected (2): " << deltaPositionRatio << std::endl;
                 exit(0);
             }
 
@@ -333,12 +276,7 @@ void PlayerControl::move(float dt)
         }
 
         // Move current position
-        std::cout << "---------------------------------------------------" << std::endl;
-        std::cout << "currentMidPos before update: " << glm::to_string(currentMidPos) << std::endl;
-        std::cout << "deltaPositionRatio: " << deltaPositionRatio << std::endl;
-        std::cout << "deltaPosition: " << glm::to_string(deltaPosition) << std::endl;
         currentMidPos += deltaPositionRatio * deltaPosition;
-        std::cout << "currentMidPos after update: " << glm::to_string(currentMidPos) << std::endl;
         // Update time left
         dt = (1.0f - deltaPositionRatio) * dt;
     }

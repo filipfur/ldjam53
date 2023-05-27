@@ -31,6 +31,12 @@ int sign(T val) {
     return (val > T(0)) - (val < T(0));
 }
 
+template <typename T>
+float fSign(T val) {
+    // See https://stackoverflow.com/a/4609795/1070480
+    return static_cast<float>(sign(val));
+}
+
 inline glm::ivec3 iCross(glm::ivec3 const& x, glm::ivec3 const& y)
 {
     return glm::ivec3(
