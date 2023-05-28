@@ -119,7 +119,7 @@ void PlayerControl::move(float dt)
 
     int loopNumber = 0;
     while (dt > 0) {
-        if (++loopNumber > 100) {
+        if (++loopNumber > goptions::maxNumMovementIterations) {
             std::cerr << "ERROR: Stuck in a loop!" << std::endl;
             exit(0);
         }
@@ -179,7 +179,7 @@ void PlayerControl::move(float dt)
                 bool firstCornerTraversable  = currentFace->cornerTraversable(firstCornerIndex);
                 bool secondCornerTraversable = currentFace->cornerTraversable(secondCornerIndex);
 
-                float characterThinningFactor = 1.0f - ((deltaPos2[otherDimIdx] == 0.0f || ratiosUntilEdgeHit[dimIdx] < 0.0f) ? 1e-3f : 0.0f); // Prevent character from hitting corners he should just scrape against but not bump into, which can happen if he is travelling parallel with one axis
+                float characterThinningFactor = 1.0f - ((deltaPos2[otherDimIdx] == 0.0f || ratiosUntilEdgeHit[dimIdx] < 0.0f) ? goptions::cornerScrapingMargin : 0.0f); // Prevent character from hitting corners he should just scrape against but not bump into, which can happen if he is travelling parallel with one axis
                 edgeAndCornerTraversable[dimIdx] = (
                     edgeTraversable[dimIdx][signToSignIdx(pSign(deltaPos2[dimIdx]))]
                     && (edgeHitPosition > -0.5f * (goptions::cubeSideLength - characterThinningFactor * _playerSizes[otherDimIdx]) || firstCornerTraversable  || !edgeTraversable[otherDimIdx][0])

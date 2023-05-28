@@ -44,6 +44,10 @@ extern const float cubeOffsetZ;
 extern const float characterWidth;
 extern const float characterHeight;
 
+extern const float cornerScrapingMargin;
+
+extern const int maxNumMovementIterations;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // CONSTANTS
