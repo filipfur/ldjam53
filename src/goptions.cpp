@@ -41,8 +41,8 @@ const float characterWidth = cubeSideLength * 17.0f/32.0f;
 const float characterHeight = cubeSideLength * 31.0f/32.0f;
 
 //const float cornerScrapingMargin = 1e-3f;
-const float cornerScrapingMargin = 1e-6f;
-//const float cornerScrapingMargin = 0.0f;
+//const float cornerScrapingMargin = 1e-6f;
+const float cornerScrapingMargin = 0.0f;
 
 const int maxNumMovementIterations = 100;
 

@@ -182,8 +182,8 @@ void PlayerControl::move(float dt)
                 float characterThinningFactor = 1.0f - ((deltaPos2[otherDimIdx] == 0.0f || ratiosUntilEdgeHit[dimIdx] < 0.0f) ? goptions::cornerScrapingMargin : 0.0f); // Prevent character from hitting corners he should just scrape against but not bump into, which can happen if he is travelling parallel with one axis
                 edgeAndCornerTraversable[dimIdx] = (
                     edgeTraversable[dimIdx][signToSignIdx(pSign(deltaPos2[dimIdx]))]
-                    && (edgeHitPosition > -0.5f * (goptions::cubeSideLength - characterThinningFactor * _playerSizes[otherDimIdx]) || firstCornerTraversable  || !edgeTraversable[otherDimIdx][0])
-                    && (edgeHitPosition <  0.5f * (goptions::cubeSideLength - characterThinningFactor * _playerSizes[otherDimIdx]) || secondCornerTraversable || !edgeTraversable[otherDimIdx][1])
+                    && (edgeHitPosition >= -0.5f * (goptions::cubeSideLength - characterThinningFactor * _playerSizes[otherDimIdx]) || firstCornerTraversable  || !edgeTraversable[otherDimIdx][0])
+                    && (edgeHitPosition <=  0.5f * (goptions::cubeSideLength - characterThinningFactor * _playerSizes[otherDimIdx]) || secondCornerTraversable || !edgeTraversable[otherDimIdx][1])
                 );
                 if (ratiosUntilFaceChange[dimIdx] < 0.0f || ratiosUntilEdgeHit[dimIdx] < 0.0f && !edgeAndCornerTraversable[dimIdx]) {
                     invalidValues = true;
