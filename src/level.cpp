@@ -153,7 +153,7 @@ const size_t Face::seminormalizedDirectionToCornerIndex(glm::ivec3 dir) const
 
 glm::ivec3 Face::facePosToCubeIPos(glm::vec3 pos, AADirection3 normal)
 {
-    return Cube::cubePosToIPos(pos - (0.5f * goptions::cubeSideLength) * normal);
+    return Cube::cubePosToIPos(pos - goptions::halfCubeSideLength * normal);
 }
 
 glm::ivec3 Face::directionDimAndSignToDirection(size_t dirDim, int dirSign)

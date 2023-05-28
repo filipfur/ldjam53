@@ -159,7 +159,7 @@ void PlayerControl::move(float dt)
         for (int dimIdx = 0; dimIdx < goptions::numPlaneDimensions; dimIdx++) {
             if (deltaPos2[dimIdx] != 0.0f) {
                 // Face change
-                float distanceUntilFaceChange = 0.5f * goptions::cubeSideLength - sign(deltaPos2[dimIdx]) * dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[dimIdx]);
+                float distanceUntilFaceChange = goptions::halfCubeSideLength - sign(deltaPos2[dimIdx]) * dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[dimIdx]);
                 ratiosUntilFaceChange[dimIdx] = distanceUntilFaceChange / absDeltaPos2[dimIdx];
 
                 // Edge hit
@@ -194,7 +194,7 @@ void PlayerControl::move(float dt)
                 ratiosUntilEdgeHit[dimIdx] = greaterThanOne;
                 edgeAndCornerTraversable[dimIdx] = true;
             }
-            intersectingEdge[dimIdx] = 0.5f * goptions::cubeSideLength - (std::abs(dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[dimIdx])) + 0.5f * _playerSizes[dimIdx]) < 0;
+            intersectingEdge[dimIdx] = goptions::halfCubeSideLength - (std::abs(dot(currentMidPos - currentCubePos, currentPlayerDimensionDirections[dimIdx])) + 0.5f * _playerSizes[dimIdx]) < 0;
         }
         if (invalidValues) {
             std::cout << "ERROR: Invalid ratio detected (1)!" << std::endl;
@@ -276,7 +276,7 @@ void PlayerControl::move(float dt)
     size_t normalDirectionDimIdx = currentPlayerDimensionDirections[NORMAL].dimension();
     int normalDirectionSign = currentPlayerDimensionDirections[NORMAL].sign();
     // Move newPosition to a face if it's not already at a face
-    newPosition[normalDirectionDimIdx] = currentFace->facePosToCubeIPos(newPosition, currentPlayerDimensionDirections[NORMAL])[normalDirectionDimIdx] * goptions::cubeSideLength + Cube::cubeOffset[normalDirectionDimIdx] + 0.5f * goptions::cubeSideLength * normalDirectionSign;
+    newPosition[normalDirectionDimIdx] = currentFace->facePosToCubeIPos(newPosition, currentPlayerDimensionDirections[NORMAL])[normalDirectionDimIdx] * goptions::cubeSideLength + Cube::cubeOffset[normalDirectionDimIdx] + goptions::halfCubeSideLength * normalDirectionSign;
 
     // Update all player attributes that changed during the loop
     _currentFace = currentFace;
