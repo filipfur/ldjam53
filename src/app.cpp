@@ -1,10 +1,23 @@
 #include "app.h"
 #include "goptions.h"
 #include "sprite.h"
+#include "utility.h"
+#include "gltext.h"
+
+#define __DEBUG_TEXT(text, x, y) _textRenderer.createText(AssetFactory::getFonts()->righteousFont, "")->setPosition(glm::vec3{x, y, 0.0f})->setUpdateCallback([this](lithium::Updateable* u, float time, float dt) { \
+        static int lastUpdate = 0.0f; \
+        if(time - lastUpdate > 0.2f) \
+        { \
+            dynamic_cast<lithium::Text*>(u)->setText(text); \
+            lastUpdate = time; \
+        } \
+        return true; \
+    });
 
 App::App() :
     Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Application::Mode::MULTISAMPLED_4X, false},
-    _rotationGraph()
+    _rotationGraph{},
+    _textRenderer{defaultFrameBufferResolution()}
 {
     AssetFactory::loadMeshes();
     AssetFactory::loadTextures();
@@ -38,6 +51,29 @@ App::App() :
     _playerControl = std::make_unique<PlayerControl>(playerSprite, input());
     _playerControl->setFaceMap(&_rotationGraph.faces(), playerSprite->position());
 
+    // For turning the camera in debugging purpose
+    input()->addPressedCallback(GLFW_KEY_LEFT, [this](int key, int mods) {
+        _cameraViewAngle += glm::pi<float>() * 0.5f; 
+        return true;
+    });
+    input()->addPressedCallback(GLFW_KEY_RIGHT, [this](int key, int mods) {
+        _cameraViewAngle -= glm::pi<float>() * 0.5f; 
+        return true;
+    });
+
+    float paddX = 16.0f;
+    float paddY = 32.0f;
+    float margY = 48.0f;
+    float startX = -defaultFrameBufferResolution().x * 0.5f;
+    float startY = defaultFrameBufferResolution().y * 0.5f;
+    int debugTexts = 0;
+
+    // Debug prints use them for all ur debugging needs
+    __DEBUG_TEXT("position: " + utility::vectorToString(_playerControl->position()), startX + paddX, startY - paddY - margY * debugTexts++);
+    __DEBUG_TEXT("view angle: " + std::to_string(glm::degrees(_cameraViewAngle)), startX + paddX, startY - paddY - margY * debugTexts++);
+    __DEBUG_TEXT("right vector: utility::vectorToString(_playerControl->???)", startX + paddX, startY - paddY - margY * debugTexts++);
+    __DEBUG_TEXT(std::string{"side: "} + "(_leftSide ? \"left\" : \"right\")", startX + paddX, startY - paddY - margY * debugTexts++);
+
     printf("%s\n", glGetString(GL_VERSION));
 }
 
@@ -54,23 +90,23 @@ void App::update(float dt)
 
     handleStateTransitions();
 
-    std::shared_ptr<lithium::SimpleCamera> camera = _pipeline->camera();
-    float t = time() * 0.1f;
-    // set t to lock at isometric view, without using magic numbers
-    t = glm::radians(45.0f);
-    float camX = sin(t) * goptions::cameraRadius;
-    float camZ = cos(t) * goptions::cameraRadius;
-    // set camY so that it is truly isometric
+    static float alpha = _cameraViewAngle;
+    alpha = glm::mix(alpha, _cameraViewAngle, dt * 4.0f);
+    auto camera = _pipeline->camera();
+    float camX = cos(alpha) * goptions::cameraRadius;
+    float camZ = sin(alpha) * goptions::cameraRadius;
     float camY = goptions::cameraRadius * 0.5f;
 
-    // Camera is following the position of _playerControl
-    camera->setTarget(glm::mix(camera->position(), _playerControl->position(), dt));
-    camera->setPosition(glm::mix(camera->position(), glm::vec3{camX, camY, camZ} + _playerControl->position(), dt));
+    camera->setTarget(glm::mix(camera->target(), _playerControl->position(), dt));
+    camera->setPosition(camera->target() + glm::vec3{camX, camY, camZ});
 
     _playerControl->update(dt);
 
+
     _pipeline->setTime(time());
     _pipeline->render();
+    _textRenderer.update(dt);
+    _textRenderer.render();
 }
 
 void App::handleStateTransitions()

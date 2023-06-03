@@ -13,6 +13,7 @@ public:
     struct Meshes
     {
         std::shared_ptr<lithium::Mesh> cube;
+        std::shared_ptr<lithium::Mesh> beam;
         std::shared_ptr<lithium::Mesh> screen;
         std::shared_ptr<lithium::Mesh> sprite;
         std::shared_ptr<lithium::Mesh> package;
@@ -27,6 +28,7 @@ public:
         std::shared_ptr<lithium::ImageTexture> delivermanSheet;
         std::shared_ptr<lithium::ImageTexture> packageDiffuse;
         std::shared_ptr<lithium::ImageTexture> letterDiffuse;
+        std::shared_ptr<lithium::ImageTexture> righteousDiffuse;
     } _textures;
 
     struct Objects

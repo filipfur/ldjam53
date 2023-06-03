@@ -9,6 +9,7 @@
 #include "glgamestate.h"
 #include "playercontrol.h"
 #include "rotationgraph.h"
+#include "ex/gltextrenderer.h"
 
 enum class GameStateType
 {
@@ -54,4 +55,6 @@ private:
     GameStateType _currentGameState;
     std::unique_ptr<PlayerControl> _playerControl;
     RotationGraph _rotationGraph;
+    float _cameraViewAngle{glm::pi<float>() * 0.25f};
+    lithium::ExTextRenderer _textRenderer;
 };
