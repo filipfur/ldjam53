@@ -69,7 +69,6 @@ void App::update(float dt)
 
     _playerControl->update(dt);
 
-    camera->update(dt);
     _pipeline->setTime(time());
     _pipeline->render();
 }
@@ -78,8 +77,9 @@ void App::handleStateTransitions()
 {
     if(!_stateTransitions.empty())
     {
-        currentGameState()->second.exit();
-        _currentGameState = *_stateTransitions.begin();
+        GameStateType nextState = *_stateTransitions.begin();
+        currentGameState()->second.exit(_gameStates.at(nextState));
+        _currentGameState = nextState;
         _stateTransitions.erase(_stateTransitions.begin());
         currentGameState()->second.enter();
         //_pipeline->updatePointLights();
