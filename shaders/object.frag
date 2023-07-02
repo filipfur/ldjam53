@@ -67,4 +67,6 @@ void main()
     fragColor = vec4(ambient + (diffuse + specular + fresnel) * color.rgb * vec3(1.0, 0.6, 0.4), color.a);
     fragColor.rgb = vec3(1.0) - exp(-fragColor.rgb * exposure);
     fragColor.rgb = pow(fragColor.rgb, vec3(1.0/2.2));
+    //fragColor = color;
+    fragColor.a = max(fragColor.a, 1.0);
 }

@@ -42,6 +42,10 @@ public:
         return  _gameStates.find(_currentGameState);
     }
 
+    virtual void onFpsCount(int fps) override
+    {
+        std::cout << "FPS: " << fps << std::endl;
+    }
 
 private:
 

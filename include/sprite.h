@@ -91,6 +91,16 @@ public:
         _zIndex = zIndex;
     }
 
+    void setAlpha(float alpha)
+    {
+        _alpha = alpha;
+    }
+
+    float alpha() const
+    {
+        return _alpha;
+    }
+
 private:
     std::map<std::string, Animation> _animations;
     std::map<std::string, Animation>::iterator _currentAnimation;
@@ -104,4 +114,5 @@ private:
     float _frameDuration{0.0f};
     float _zIndex{0.0f};
     bool _flipped{false};
+    float _alpha{0.0f};
 };

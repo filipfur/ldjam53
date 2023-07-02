@@ -26,6 +26,7 @@ void Sprite::shade(lithium::ShaderProgram* shaderProgram)
         shaderProgram->setUniform("u_region_position", _regionPosition);
         shaderProgram->setUniform("u_flipped", _flipped);
         shaderProgram->setUniform("u_z_index", _zIndex);
+        shaderProgram->setUniform("u_alpha", _alpha);
     }
 }
 

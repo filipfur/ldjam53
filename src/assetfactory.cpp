@@ -42,6 +42,51 @@ static const std::vector<GLuint> screenMeshIndices = {
     0, 3, 2
 };
 
+static const std::vector<GLfloat> skyboxVertices = {
+    // positions          
+    -1.0f,  1.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+
+    -1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
+
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+
+    -1.0f, -1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
+
+    -1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f, -1.0f,
+
+    -1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f
+};
+
 void AssetFactory::loadMeshes()
 {
     AssetFactory& instance = getInstance();
@@ -53,16 +98,28 @@ void AssetFactory::loadMeshes()
     instance._meshes.beam = lithium::tinyobjloader_load("assets/package/beam.obj", objectAttributes);
     instance._meshes.slot = lithium::tinyobjloader_load("assets/package/slot.obj", objectAttributes);
     instance._meshes.level1 = lithium::tinyobjloader_load("assets/package/level1.obj", objectAttributes);
+    instance._meshes.cubemap.reset(new lithium::Mesh({POSITION}, skyboxVertices));
 }
 
 void AssetFactory::loadTextures()
 {
     AssetFactory& instance = getInstance();
     instance._textures.logoDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/Kraxbox_logo_lithium_metal_2ff2069c-b84a-426c-bf92-e9831105a5df.png", GL_SRGB_ALPHA, GL_RGBA)->setFilter(GL_NEAREST));
-    instance._textures.delivermanSheet.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/deliverman.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
-    instance._textures.packageDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/package64/packages.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
-    instance._textures.letterDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/letter.png", GL_SRGB_ALPHA, GL_RGBA, 1)->setFilter(GL_NEAREST));
+    instance._textures.delivermanSheet.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/player/thinrat.png", GL_SRGB_ALPHA, GL_RGBA)->setFilter(GL_NEAREST));
+    instance._textures.packageDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/package64/packages.png", GL_SRGB_ALPHA, GL_RGBA)->setFilter(GL_NEAREST)->setWrap(GL_CLAMP_TO_BORDER));
+    instance._textures.letterDiffuse.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/letter.png", GL_SRGB_ALPHA, GL_RGBA)->setFilter(GL_NEAREST));
+    instance._textures.noiseTexture.reset((lithium::ImageTexture*)lithium::ImageTexture::load("assets/Perlin 24 - 512x512.png", GL_SRGB_ALPHA, GL_RGBA)->setFilter(GL_LINEAR)->setWrap(GL_REPEAT));
     instance._textures.righteousDiffuse.reset(lithium::ImageTexture::load("assets/righteous/Righteous.png", GL_RGB, GL_RGBA, 1, false));
+    instance._textures.floorDiffuse.reset((lithium::ImageTexture*)(lithium::ImageTexture::load("assets/package64/floor2.png", GL_SRGB_ALPHA, GL_RGBA)->setFilter(GL_LINEAR)->setWrap(GL_REPEAT)));
+    instance._textures.skyboxCubemap = lithium::Cubemap::load({
+        "assets/skybox/right.png",
+        "assets/skybox/left.png",
+        "assets/skybox/top.png",
+        "assets/skybox/bottom.png",
+        "assets/skybox/front.png",
+        "assets/skybox/back.png"
+    });
+    instance._textures.skyboxCubemap->setFilter(GL_LINEAR);
 }
 
 void AssetFactory::loadObjects()

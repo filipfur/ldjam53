@@ -15,7 +15,7 @@
     });
 
 App::App() :
-    Application{"lithium-lab", glm::ivec2{1440, 800}, lithium::Application::Mode::MULTISAMPLED_4X, false},
+    Application{"lithium-lab", glm::ivec2{1920, 1080}, lithium::Application::Mode::MULTISAMPLED_4X, false},
     _rotationGraph{},
     _textRenderer{defaultFrameBufferResolution()}
 {
@@ -25,19 +25,35 @@ App::App() :
     AssetFactory::loadFonts();
     _pipeline = std::make_shared<Pipeline>(defaultFrameBufferResolution());
 
-    auto playerSprite = std::make_shared<Sprite>(AssetFactory::getMeshes()->sprite,
-        TextureArray{AssetFactory::getTextures()->delivermanSheet}, glm::ivec2{32, 32});
-    playerSprite->setPosition(glm::vec3{0.0f, 0.0f, 1.0f});
+    auto spriteMesh = std::shared_ptr<lithium::Mesh>(
+        new lithium::Mesh({lithium::VertexArrayBuffer::AttributeType::VEC3},
+        {0.0f, 0.0f, 0.0f})
+    );
+    spriteMesh->setDrawMode(GL_POINTS);
+
+    auto playerSprite = std::make_shared<Sprite>(spriteMesh,
+        TextureArray{AssetFactory::getTextures()->delivermanSheet}, glm::ivec2{96, 96});
+    playerSprite->setPosition(glm::vec3{6.99f, 0.0f, 1.0f});
     playerSprite->setScale(2.0f);
     playerSprite->setFramesPerSecond(12.0f);
-    playerSprite->createAnimation("idle", {0, 0, 0, 1, 1});
-    playerSprite->createAnimation("walk", {2, 3, 4, 5});
+    playerSprite->createAnimation("idle", {0});
+    playerSprite->createAnimation("walk", {0});
     playerSprite->setAnimation("idle");
     playerSprite->setZIndex(-0.01f);
     playerSprite->setGroupId(Pipeline::PLAYER);
     _pipeline->attach(playerSprite.get());
     playerSprite->stage();
 
+
+    input()->addPressedCallback(GLFW_KEY_Q, [this, playerSprite](int key, int mods) {
+        playerSprite->setAlpha(playerSprite->alpha() - 0.1f);
+        return true;
+    });
+
+    input()->addPressedCallback(GLFW_KEY_E, [this, playerSprite](int key, int mods) {
+        playerSprite->setAlpha(playerSprite->alpha() + 0.1f);
+        return true;
+    });
 
     input()->addPressedCallback(GLFW_KEY_ESCAPE, [this](int key, int mods) {
         this->close();
@@ -74,6 +90,8 @@ App::App() :
     __DEBUG_TEXT("right vector: utility::vectorToString(_playerControl->???)", startX + paddX, startY - paddY - margY * debugTexts++);
     __DEBUG_TEXT(std::string{"side: "} + "(_leftSide ? \"left\" : \"right\")", startX + paddX, startY - paddY - margY * debugTexts++);
 
+    AssetFactory::getTextures()->noiseTexture->bind(GL_TEXTURE1);
+
     printf("%s\n", glGetString(GL_VERSION));
 }
 
@@ -95,10 +113,11 @@ void App::update(float dt)
     auto camera = _pipeline->camera();
     float camX = cos(alpha) * goptions::cameraRadius;
     float camZ = sin(alpha) * goptions::cameraRadius;
-    float camY = goptions::cameraRadius * 0.5f;
+    float camY = goptions::cameraRadius * 0.1f;
+    glm::vec3 target = _playerControl->position() + glm::vec3{0.0f, camY, 0.0f};
 
-    camera->setTarget(glm::mix(camera->target(), _playerControl->position(), dt));
-    camera->setPosition(camera->target() + glm::vec3{camX, camY, camZ});
+    camera->setTarget(glm::mix(camera->target(), target, dt * 1.5f));
+    camera->setPosition(camera->target() + glm::vec3{camX, 0.0f, camZ});
 
     _playerControl->update(dt);
 
@@ -106,7 +125,7 @@ void App::update(float dt)
     _pipeline->setTime(time());
     _pipeline->render();
     _textRenderer.update(dt);
-    _textRenderer.render();
+    //_textRenderer.render();
 }
 
 void App::handleStateTransitions()

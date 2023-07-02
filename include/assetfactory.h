@@ -6,6 +6,7 @@
 #include "gltinyobjloader.h"
 #include "gltfloader.h"
 #include "glskinnedobject.h"
+#include "glcubemap.h"
 
 class AssetFactory
 {
@@ -20,6 +21,7 @@ public:
         std::shared_ptr<lithium::Mesh> longPackage;
         std::shared_ptr<lithium::Mesh> slot;
         std::shared_ptr<lithium::Mesh> level1;
+        std::shared_ptr<lithium::Mesh> cubemap;
     } _meshes;
 
     struct Textures
@@ -29,6 +31,9 @@ public:
         std::shared_ptr<lithium::ImageTexture> packageDiffuse;
         std::shared_ptr<lithium::ImageTexture> letterDiffuse;
         std::shared_ptr<lithium::ImageTexture> righteousDiffuse;
+        std::shared_ptr<lithium::ImageTexture> noiseTexture;
+        std::shared_ptr<lithium::ImageTexture> floorDiffuse;
+        std::shared_ptr<lithium::Cubemap> skyboxCubemap;
     } _textures;
 
     struct Objects

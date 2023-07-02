@@ -1,5 +1,6 @@
 #include "app.h"
 #include "utility.h"
+#include "glplane.h"
 
 void App::createLevel1()
 {
@@ -110,7 +111,22 @@ void App::createLevel1()
         return true;
     });
 
+    auto skybox = std::shared_ptr<lithium::Object>(new lithium::Object(AssetFactory::getMeshes()->cubemap, {
+        AssetFactory::getTextures()->skyboxCubemap}));
+    skybox->setScale(40.0f);
+
+    //_outsideShackScene->collisionSystem()->insertAABB(theFloor);
+    skybox->setGroupId(Pipeline::SKYBOX);
+
+    auto floor = std::make_shared<lithium::Object>(std::shared_ptr<lithium::Mesh>(lithium::Plane3D(glm::vec3{1.0f}, glm::vec3{40.0f})),
+        std::vector<lithium::Object::TexturePointer>{AssetFactory::getTextures()->floorDiffuse});
+    floor->setPosition(glm::vec3{1.0f, 0.0f, 1.0f});
+    floor->setScale(40.0f);
+    floor->setRotation(glm::vec3{-90.0f, 0.0f, 0.0f});
+
     auto firstScene = std::make_shared<lithium::Scene>();
+    firstScene->addObject(skybox);
+    firstScene->addObject(floor);
     firstScene->addObject(object);
     firstScene->addObject(longPackage);
     firstScene->addObject(slot);

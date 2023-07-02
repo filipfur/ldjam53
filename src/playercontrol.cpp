@@ -285,6 +285,36 @@ void PlayerControl::move(float dt)
     _playerDimensionDirections[0] = currentPlayerDimensionDirections[0];
     _playerDimensionDirections[1] = currentPlayerDimensionDirections[1];
     _playerDimensionDirections[2] = currentPlayerDimensionDirections[2];
+
+
+    // compute alpha
+
+    size_t horizontalDirectionDimIdx = currentPlayerDimensionDirections[HORIZONTAL].dimension();
+    size_t verticalDirectionDimIdx = currentPlayerDimensionDirections[VERTICAL].dimension();
+
+    float deltaRight = (_currentFace->cube()->pos()[horizontalDirectionDimIdx] - newPosition[horizontalDirectionDimIdx])
+        * currentPlayerDimensionDirections[HORIZONTAL].sign();
+
+    float deltaUp = (_currentFace->cube()->pos()[verticalDirectionDimIdx] - newPosition[verticalDirectionDimIdx])
+        * currentPlayerDimensionDirections[VERTICAL].sign() - 0.5f * goptions::cubeSideLength;
+
+    if(deltaRight != 0)
+    {
+        auto horizontalEdgeDir = currentPlayerDimensionDirections[HORIZONTAL];
+        if(deltaRight < 0)
+        {
+            horizontalEdgeDir.signMul(-1);
+        }
+        size_t neighborIdx = _currentFace->aADirection3ToEdgeIndex(horizontalEdgeDir);
+        Face* neighbor = _currentFace->neighbor(neighborIdx);
+        if(_currentFace->normal() != neighbor->normal())
+        {
+            float myAlpha = deltaRight / goptions::cubeSideLength;
+            _sprite->setAlpha((myAlpha - 0.5f) * 2.0f);
+        }
+    }
+
+    // set drawPosition to position of current edge (for drawing)
 }
 
 void PlayerControl::setFaceMap(FaceMap* faces, glm::vec3 playerPos)
