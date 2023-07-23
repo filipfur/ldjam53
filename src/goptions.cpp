@@ -22,6 +22,8 @@
 namespace goptions
 {
 
+const bool shouldApplyCreaseRenderingBugFix = false;
+
 const float cubeSideLength = 2.0f;
 const float cameraRadius = 14.0f;
 

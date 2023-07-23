@@ -36,6 +36,7 @@ public:
 
     virtual void update(float dt) override;
     void move(float dt);
+    void updateSpriteMesh();
     void setFaceMap(FaceMap* faces, glm::vec3 playerPos);
     void increaseSpeedComponent(size_t dim, float increase);
     void increaseSpeedRight(float increase);
@@ -57,8 +58,9 @@ public:
         return _sprite->position();
     }
 
-    static glm::vec3 playerPosToMidPos(glm::vec3 playerPos, AADirection3 playerUpDirection);
     static glm::vec3 playerMidPosToPos(glm::vec3 playerMidPos, AADirection3 playerUpDirection);
+    static glm::vec3 playerPosToMidPos(glm::vec3 playerPos, AADirection3 playerUpDirection);
+    static glm::vec3 playerPosToSpriteMidPos(glm::vec3 playerPos, AADirection3 playerUpDirection);
     static glm::ivec3 playerFaceCubeIPos(glm::vec3 playerPos, AADirection3 playerUpDirection, AADirection3 playerNormal);
 
 private:

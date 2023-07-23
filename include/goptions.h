@@ -25,6 +25,8 @@ namespace goptions
 
 // Compile-time intialized in goptions.cpp
 
+extern const bool shouldApplyCreaseRenderingBugFix;
+
 extern const float cubeSideLength;
 extern const float cameraRadius;
 

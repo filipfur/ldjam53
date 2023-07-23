@@ -72,6 +72,7 @@ void PlayerControl::update(float dt)
     //increaseSpeedUp(-goptions::gravity * dt);
 
     move(dt);
+    updateSpriteMesh();
 
     if(oldState != _state)
     {
@@ -285,36 +286,42 @@ void PlayerControl::move(float dt)
     _playerDimensionDirections[0] = currentPlayerDimensionDirections[0];
     _playerDimensionDirections[1] = currentPlayerDimensionDirections[1];
     _playerDimensionDirections[2] = currentPlayerDimensionDirections[2];
+}
 
-
+void PlayerControl::updateSpriteMesh()
+{
     // Compute parameters for rendering a crease in the character.
 
     // Initialize them with default values that will work even if no crease if found.
     float alpha = 0.0;
     size_t creaseDirPlaneDim = 0;
     int creaseDirPlaneSign = 1;
-    AADirection3 creaseDir = currentPlayerDimensionDirections[HORIZONTAL];
+    AADirection3 creaseDir = _playerDimensionDirections[HORIZONTAL];
     int normalTobendDirFactor = 1;
 
     // Compute auxilliary variables
-    glm::vec3 newMidPos = playerPosToMidPos(newPosition, currentPlayerDimensionDirections[VERTICAL]);
+    glm::vec3 spriteMidPos = playerPosToSpriteMidPos(_sprite->position(), _playerDimensionDirections[VERTICAL]);
 
     // Loop through all dimensions to find any crease
-    float maxAbsDeltaPos = 0.0f;
+    float maxCharacterEdgeOverlap = -goptions::cubeSideLength;
     for (size_t curretCreaseDirPlaneDim = 0; curretCreaseDirPlaneDim < goptions::numPlaneDimensions; curretCreaseDirPlaneDim++) {
-        size_t spaceDirDimIdx = currentPlayerDimensionDirections[curretCreaseDirPlaneDim].dimension();
-        int spaceDirSign = currentPlayerDimensionDirections[curretCreaseDirPlaneDim].sign();
-        float deltaPos = spaceDirSign * (newMidPos[spaceDirDimIdx] - _currentFace->cube()->pos()[spaceDirDimIdx]);
+        size_t spaceDirDimIdx = _playerDimensionDirections[curretCreaseDirPlaneDim].dimension();
+        int spaceDirSign = _playerDimensionDirections[curretCreaseDirPlaneDim].sign();
+        float deltaPos = spaceDirSign * (spriteMidPos[spaceDirDimIdx] - _currentFace->cube()->pos()[spaceDirDimIdx]);
 
-        int currentCreaseDirPlaneSign = sign(deltaPos);
+        int currentCreaseDirPlaneSign = pSign(deltaPos);
         float currentAbsDeltaPos = deltaPos * currentCreaseDirPlaneSign;
+        float currentCharacterEdgeOverlap = currentAbsDeltaPos - (goptions::shouldApplyCreaseRenderingBugFix ? (curretCreaseDirPlaneDim == HORIZONTAL ?
+            (goptions::cubeSideLength - goptions::characterWidth) / 2 :
+            (currentCreaseDirPlaneSign == 1 ? goptions::cubeSideLength - goptions::characterHeight : 0.0f)
+        ) : 0.0f);
 
-        if (currentAbsDeltaPos < maxAbsDeltaPos) {
+        if (currentCharacterEdgeOverlap < maxCharacterEdgeOverlap) {
             // We already have another more pronounced crease
             continue;
         }
 
-        AADirection3 currentCreaseDir = currentPlayerDimensionDirections[curretCreaseDirPlaneDim].signMul(currentCreaseDirPlaneSign);
+        AADirection3 currentCreaseDir = _playerDimensionDirections[curretCreaseDirPlaneDim].signMul(currentCreaseDirPlaneSign);
         size_t currentNeighborIdx = _currentFace->aADirection3ToEdgeIndex(currentCreaseDir);
         Face* currentNeighbor = _currentFace->neighbor(currentNeighborIdx);
 
@@ -331,17 +338,15 @@ void PlayerControl::move(float dt)
         creaseDir = currentCreaseDir;
         normalTobendDirFactor = -currentCreaseDir.dot(currentNeighbor->normal());
 
-        maxAbsDeltaPos = currentAbsDeltaPos;
+        maxCharacterEdgeOverlap = currentCharacterEdgeOverlap;
     }
 
     _sprite->setAlpha(alpha);
-    _sprite->setCreaseDirPlaneSign(creaseDirPlaneSign);
     _sprite->setCreaseDirPlaneDim(creaseDirPlaneDim);
+    _sprite->setCreaseDirPlaneSign(creaseDirPlaneSign);
     _sprite->setCreaseDir(creaseDir.toVec3());
-    _sprite->setNormal(currentPlayerDimensionDirections[NORMAL].toVec3());
+    _sprite->setNormal(_playerDimensionDirections[NORMAL].toVec3());
     _sprite->setNormalTobendDirFactor(normalTobendDirFactor);
-
-    // set drawPosition to position of current edge (for drawing)
 }
 
 void PlayerControl::setFaceMap(FaceMap* faces, glm::vec3 playerPos)
@@ -401,14 +406,19 @@ void PlayerControl::setSpeedUp(float speed)
     setSpeedComponent(VERTICAL, speed);
 }
 
+glm::vec3 PlayerControl::playerMidPosToPos(glm::vec3 playerMidPos, AADirection3 playerUpDirection)
+{
+    return playerMidPos - 0.5f * goptions::characterHeight * playerUpDirection;
+}
+
 glm::vec3 PlayerControl::playerPosToMidPos(glm::vec3 playerPos, AADirection3 playerUpDirection)
 {
     return playerPos + 0.5f * goptions::characterHeight * playerUpDirection;
 }
 
-glm::vec3 PlayerControl::playerMidPosToPos(glm::vec3 playerMidPos, AADirection3 playerUpDirection)
+glm::vec3 PlayerControl::playerPosToSpriteMidPos(glm::vec3 playerPos, AADirection3 playerUpDirection)
 {
-    return playerMidPos - 0.5f * goptions::characterHeight * playerUpDirection;
+    return playerPos + 0.5f * goptions::cubeSideLength * playerUpDirection;
 }
 
 glm::ivec3 PlayerControl::playerFaceCubeIPos(glm::vec3 playerPos, AADirection3 playerUpDirection, AADirection3 playerNormal)
