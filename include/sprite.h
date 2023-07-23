@@ -101,6 +101,31 @@ public:
         return _alpha;
     }
 
+    void setCreaseDir(glm::vec3 creaseDir)
+    {
+        _creaseDir = creaseDir;
+    }
+
+    void setNormal(glm::vec3 normal)
+    {
+        _normal = normal;
+    }
+
+    void setNormalTobendDirFactor(int normalTobendDirFactor)
+    {
+        _normalTobendDirFactor = normalTobendDirFactor;
+    }
+
+    void setCreaseDirPlaneDim(size_t creaseDirPlaneDim)
+    {
+        _creaseDirPlaneDim = creaseDirPlaneDim;
+    }
+
+    void setCreaseDirPlaneSign(int creaseDirPlaneSign)
+    {
+        _creaseDirPlaneSign = creaseDirPlaneSign;
+    }
+
 private:
     std::map<std::string, Animation> _animations;
     std::map<std::string, Animation>::iterator _currentAnimation;
@@ -115,4 +140,9 @@ private:
     float _zIndex{0.0f};
     bool _flipped{false};
     float _alpha{0.0f};
+    glm::vec3 _creaseDir{0.0f};
+    glm::vec3 _normal{0.0f};
+    int _normalTobendDirFactor{0};
+    size_t _creaseDirPlaneDim{0};
+    int _creaseDirPlaneSign{0};
 };

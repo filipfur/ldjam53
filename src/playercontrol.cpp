@@ -287,32 +287,59 @@ void PlayerControl::move(float dt)
     _playerDimensionDirections[2] = currentPlayerDimensionDirections[2];
 
 
-    // compute alpha
+    // Compute parameters for rendering a crease in the character.
 
-    size_t horizontalDirectionDimIdx = currentPlayerDimensionDirections[HORIZONTAL].dimension();
-    size_t verticalDirectionDimIdx = currentPlayerDimensionDirections[VERTICAL].dimension();
+    // Initialize them with default values that will work even if no crease if found.
+    float alpha = 0.0;
+    size_t creaseDirPlaneDim = 0;
+    int creaseDirPlaneSign = 1;
+    AADirection3 creaseDir = currentPlayerDimensionDirections[HORIZONTAL];
+    int normalTobendDirFactor = 1;
 
-    float deltaRight = (_currentFace->cube()->pos()[horizontalDirectionDimIdx] - newPosition[horizontalDirectionDimIdx])
-        * currentPlayerDimensionDirections[HORIZONTAL].sign();
+    // Compute auxilliary variables
+    glm::vec3 newMidPos = playerPosToMidPos(newPosition, currentPlayerDimensionDirections[VERTICAL]);
 
-    float deltaUp = (_currentFace->cube()->pos()[verticalDirectionDimIdx] - newPosition[verticalDirectionDimIdx])
-        * currentPlayerDimensionDirections[VERTICAL].sign() - 0.5f * goptions::cubeSideLength;
+    // Loop through all dimensions to find any crease
+    float maxAbsDeltaPos = 0.0f;
+    for (size_t curretCreaseDirPlaneDim = 0; curretCreaseDirPlaneDim < goptions::numPlaneDimensions; curretCreaseDirPlaneDim++) {
+        size_t spaceDirDimIdx = currentPlayerDimensionDirections[curretCreaseDirPlaneDim].dimension();
+        int spaceDirSign = currentPlayerDimensionDirections[curretCreaseDirPlaneDim].sign();
+        float deltaPos = spaceDirSign * (newMidPos[spaceDirDimIdx] - _currentFace->cube()->pos()[spaceDirDimIdx]);
 
-    if(deltaRight != 0)
-    {
-        auto horizontalEdgeDir = currentPlayerDimensionDirections[HORIZONTAL];
-        if(deltaRight < 0)
-        {
-            horizontalEdgeDir.signMul(-1);
+        int currentCreaseDirPlaneSign = sign(deltaPos);
+        float currentAbsDeltaPos = deltaPos * currentCreaseDirPlaneSign;
+
+        if (currentAbsDeltaPos < maxAbsDeltaPos) {
+            // We already have another more pronounced crease
+            continue;
         }
-        size_t neighborIdx = _currentFace->aADirection3ToEdgeIndex(horizontalEdgeDir);
-        Face* neighbor = _currentFace->neighbor(neighborIdx);
-        if(_currentFace->normal() != neighbor->normal())
+
+        AADirection3 currentCreaseDir = currentPlayerDimensionDirections[curretCreaseDirPlaneDim].signMul(currentCreaseDirPlaneSign);
+        size_t currentNeighborIdx = _currentFace->aADirection3ToEdgeIndex(currentCreaseDir);
+        Face* currentNeighbor = _currentFace->neighbor(currentNeighborIdx);
+
+        if(_currentFace->normal() == currentNeighbor->normal())
         {
-            float myAlpha = deltaRight / goptions::cubeSideLength;
-            _sprite->setAlpha((myAlpha - 0.5f) * 2.0f);
+            // There is no crease in this direction.
+            continue;
         }
+
+        // We have found the most important crease so far; store its details
+        alpha = currentAbsDeltaPos / goptions::cubeSideLength;
+        creaseDirPlaneDim = curretCreaseDirPlaneDim;
+        creaseDirPlaneSign = currentCreaseDirPlaneSign;
+        creaseDir = currentCreaseDir;
+        normalTobendDirFactor = -currentCreaseDir.dot(currentNeighbor->normal());
+
+        maxAbsDeltaPos = currentAbsDeltaPos;
     }
+
+    _sprite->setAlpha(alpha);
+    _sprite->setCreaseDirPlaneSign(creaseDirPlaneSign);
+    _sprite->setCreaseDirPlaneDim(creaseDirPlaneDim);
+    _sprite->setCreaseDir(creaseDir.toVec3());
+    _sprite->setNormal(currentPlayerDimensionDirections[NORMAL].toVec3());
+    _sprite->setNormalTobendDirFactor(normalTobendDirFactor);
 
     // set drawPosition to position of current edge (for drawing)
 }

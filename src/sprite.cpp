@@ -1,4 +1,5 @@
 #include "sprite.h"
+#include "goptions.h"
 
 Sprite::Sprite(std::shared_ptr<lithium::Mesh> mesh, const std::vector<lithium::Object::TexturePointer>& textures, const glm::ivec2& spriteDimension) : lithium::Object(mesh, textures)
 {
@@ -27,6 +28,12 @@ void Sprite::shade(lithium::ShaderProgram* shaderProgram)
         shaderProgram->setUniform("u_flipped", _flipped);
         shaderProgram->setUniform("u_z_index", _zIndex);
         shaderProgram->setUniform("u_alpha", _alpha);
+        shaderProgram->setUniform("u_halfSideLength", 0.5f * goptions::cubeSideLength);
+        shaderProgram->setUniform("u_creaseDir", _creaseDir);
+        shaderProgram->setUniform("u_normal", _normal);
+        shaderProgram->setUniform("u_normalTobendDirFactor", _normalTobendDirFactor);
+        shaderProgram->setUniform("u_creaseDirPlaneDim", static_cast<int>(_creaseDirPlaneDim));
+        shaderProgram->setUniform("u_creaseDirPlaneSign", _creaseDirPlaneSign);
     }
 }
 
@@ -41,4 +48,3 @@ void Sprite::update(float dt)
         _regionPosition = _currentAnimation->second.uvs[_currentFrame % _currentAnimation->second.uvs.size()];
     }
 }
-
